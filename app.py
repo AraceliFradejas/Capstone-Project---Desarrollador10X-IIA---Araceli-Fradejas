@@ -20,38 +20,87 @@ st.set_page_config(
 st.title("📊 Dashboard de Análisis de Comunicaciones - KelceTS")
 st.markdown("---")
 
-# Función para cargar datos
-@st.cache_data
+@st.cache_data(ttl=10)  # Reducimos el tiempo de caché a 10 segundos
 def cargar_datos():
-    # Datos simulados para demostración
-    data_resumen = {
-        'ID': list(range(1, 11)),
-        'Comentario_Original': ['Ejemplo de comentario 1', 'Ejemplo de comentario 2'] * 5,
-        'Idioma': ['español', 'alemán', 'español', 'finés', 'portugués'] * 2,
-        'Valoracion': ['positiva', 'negativa', 'positiva', 'negativa', 'neutra'] * 2,
-        'Envio_96h': ['sí', 'no', 'sí', 'no', 'no mencionado'] * 2,
-        'Embalaje_Danado': ['no', 'sí', 'no', 'no', 'no mencionado'] * 2,
-        'Talla_Correcta': ['sí', 'no', 'sí', 'no', 'no mencionado'] * 2,
-        'Materiales_Calidad': ['sí', 'no', 'parcialmente', 'no', 'no mencionado'] * 2,
-        'Tipo_Uso': ['diario', 'ocasional', 'diario', 'ocasional', 'no mencionado'] * 2,
-        'Cumple_Expectativas': ['sí', 'no', 'parcialmente', 'no', 'no mencionado'] * 2
-    }
-    
-    # Datos simulados para estadísticas
-    data_estadisticas = {
-        'Métrica': [
-            'Total Comentarios',
-            'Valoraciones Positivas',
-            'Valoraciones Negativas',
-            'Valoraciones Neutras',
-            'Problemas de Calidad Materiales',
-            'Problemas de Talla',
-            'Problemas de Envío',
-            'Problemas de Embalaje',
-            'Satisfacción General (%)'
-        ],
-        'Valor': [10, 4, 4, 2, 4, 4, 4, 2, 60]
-    }
+    try:
+        # Rutas de posibles ubicaciones de los archivos
+        rutas_posibles = [
+            "analisis_comentarios_kelcets.xlsx",  # Directorio actual
+            "./analisis_comentarios_kelcets.xlsx",
+            "../analisis_comentarios_kelcets.xlsx",
+            "/workspaces/codespaces-blank/analisis_comentarios_kelcets.xlsx",  # Ruta específica de Codespaces
+            # Agrega cualquier otra ruta que pueda ser relevante
+        ]
+        
+        # Intentar cargar desde cada ruta posible
+        df = None
+        df_comunicaciones = None
+        df_estadisticas = None
+        archivo_cargado = None
+        
+        for ruta in rutas_posibles:
+            try:
+                st.sidebar.text(f"Intentando cargar: {ruta}")
+                if os.path.exists(ruta):
+                    # Cargar los datos desde el archivo Excel
+                    df = pd.read_excel(ruta, sheet_name='Resumen')
+                    df_comunicaciones = pd.read_excel(ruta, sheet_name='Comunicaciones')
+                    df_estadisticas = pd.read_excel(ruta, sheet_name='Estadísticas')
+                    archivo_cargado = ruta
+                    st.sidebar.success(f"Datos cargados desde: {ruta}")
+                    break
+            except Exception as e:
+                st.sidebar.error(f"Error al cargar {ruta}: {e}")
+        
+        if df is None:
+            # Si no se pudo cargar el archivo, mostrar los archivos disponibles en el directorio
+            st.sidebar.warning("No se pudo cargar el archivo. Archivos disponibles:")
+            try:
+                archivos = os.listdir(".")
+                for archivo in archivos:
+                    st.sidebar.text(f" - {archivo}")
+            except:
+                st.sidebar.error("No se pudo listar los archivos")
+            
+            # Usar datos simulados como respaldo
+            st.warning("⚠️ Usando datos simulados como respaldo")
+            data_resumen = {
+                'ID': list(range(1, 11)),
+                'Comentario_Original': ['Ejemplo de comentario 1', 'Ejemplo de comentario 2'] * 5,
+                'Idioma': ['español', 'alemán', 'español', 'finés', 'portugués'] * 2,
+                'Valoracion': ['positiva', 'negativa', 'positiva', 'negativa', 'neutra'] * 2,
+                'Envio_96h': ['sí', 'no', 'sí', 'no', 'no mencionado'] * 2,
+                'Embalaje_Danado': ['no', 'sí', 'no', 'no', 'no mencionado'] * 2,
+                'Talla_Correcta': ['sí', 'no', 'sí', 'no', 'no mencionado'] * 2,
+                'Materiales_Calidad': ['sí', 'no', 'parcialmente', 'no', 'no mencionado'] * 2,
+                'Tipo_Uso': ['diario', 'ocasional', 'diario', 'ocasional', 'no mencionado'] * 2,
+                'Cumple_Expectativas': ['sí', 'no', 'parcialmente', 'no', 'no mencionado'] * 2
+            }
+            
+            data_estadisticas = {
+                'Métrica': [
+                    'Total Comentarios',
+                    'Valoraciones Positivas',
+                    'Valoraciones Negativas',
+                    'Valoraciones Neutras',
+                    'Problemas de Calidad Materiales',
+                    'Problemas de Talla',
+                    'Problemas de Envío',
+                    'Problemas de Embalaje',
+                    'Satisfacción General (%)'
+                ],
+                'Valor': [10, 4, 4, 2, 4, 4, 4, 2, 60]
+            }
+            
+            df = pd.DataFrame(data_resumen)
+            df_comunicaciones = pd.DataFrame(data_resumen)
+            df_estadisticas = pd.DataFrame(data_estadisticas)
+            
+        return df, df_comunicaciones, df_estadisticas, (archivo_cargado is not None)
+        
+    except Exception as e:
+        st.error(f"Error en la función cargar_datos: {e}")
+        return None, None, None, False
     
     # Crear DataFrames
     df = pd.DataFrame(data_resumen)
@@ -65,17 +114,16 @@ st.sidebar.title("Navegación")
 
 # Botón de refrescar en la barra lateral
 with st.sidebar:
+    st.sidebar.write("Última actualización de datos:")
+    st.sidebar.write(pd.Timestamp.now().strftime("%d/%m/%Y %H:%M:%S"))
+    
     if st.button('🔄 Refrescar datos'):
+        # Limpiar todas las cachés
         st.cache_data.clear()
-        st.success("Datos refrescados correctamente")
+        st.cache_resource.clear()
+        st.success("Caché limpiada. Recargando datos...")
         st.rerun()
-
-seccion = st.sidebar.radio(
-    "Selecciona una sección:",
-    ["Resumen General", "Análisis por Idioma", "Análisis de Satisfacción", 
-     "Problemas Detectados", "Datos en Bruto"]
-)
-
+        
 # Cargar datos - Movido después del botón de refrescar para asegurar que se carguen datos frescos
 df, df_comunicaciones, df_estadisticas, datos_cargados = cargar_datos()
 
