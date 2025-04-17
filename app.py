@@ -1,127 +1,204 @@
-@st.cache_data(ttl=10)  # Reducimos el tiempo de caché a 10 segundos
-def cargar_datos():
+"""
+🧠 Capstone Project - Dashboard Estratégico de Comentarios (KelceTS S.L.)
+Instituto de Inteligencia Artificial - Curso Desarrollador 10x
+
+👤 Estudiante: Araceli Fradejas Muñoz  
+📅 Fecha de entrega: 21/04/2025
+
+📄 Descripción del Proyecto:
+KelceTS S.L. es una startup ficticia especializada en la venta de zapatillas online en Europa.
+
+Este dashboard ha sido diseñado para ofrecer a la Dirección y al CEO una **visión analítica y estratégica** 
+sobre los comentarios que los clientes dejan en diferentes idiomas y canales (email, redes sociales, etc.).
+
+🎯 Objetivos de la App:
+- Visualizar el volumen y evolución de comentarios recibidos
+- Analizar las temáticas predominantes (logística, calidad, otros)
+- Detectar idiomas más frecuentes y distribución geográfica
+- Medir el número de comunicaciones generadas (cliente, logística, proveedor)
+- Estimar costes de respuesta manual vs automática con IA
+- Facilitar decisiones estratégicas basadas en datos en tiempo real
+
+🔐 Gestión de claves:
+- Carga segura de claves OpenAI y Gemini mediante archivo `.env` (NO se sube a GitHub)
+- Fallback automático a Gemini (Google Cloud) si OpenAI no responde
+
+📁 Datos utilizados desde el directorio `/data` del repositorio:
+- BD Comentarios KelceTS.txt
+- Reglas de calidad, logística, clientes y proveedores
+
+💡 Impacto esperado:
+- Mayor conocimiento de incidencias recurrentes
+- Optimización del proceso de atención al cliente
+- Visión ejecutiva sobre el uso de IA en el análisis multilingüe de clientes
+- Apoyo a decisiones estratégicas con métricas visuales y automáticas
+"""
+
+# ====================================================
+# ⚙️ 1. Preparación del entorno y carga de librerías
+# ====================================================
+#
+# En esta sección importamos únicamente las librerías necesarias
+# para ejecutar análisis estratégico en la app Streamlit.
+#
+# Este enfoque está centrado en la visualización y análisis
+# de datos provenientes de comentarios de clientes para la
+# toma de decisiones por parte de la Dirección y el CEO.
+#
+# Las principales funcionalidades incluyen:
+# - Análisis textual y detección de idioma
+# - Carga y procesamiento de archivos desde /data
+# - Cálculo de métricas e indicadores clave (KPIs)
+# - Visualización gráfica e interactiva en Streamlit
+# - Conexión con modelos de lenguaje (OpenAI y Gemini)
+
+# 💾 Gestión del sistema
+import os
+import json
+import re
+from datetime import datetime
+
+# 📊 Manipulación y análisis de datos
+import pandas as pd
+import numpy as np
+
+# 🌍 Detección automática de idioma
+from langdetect import detect, DetectorFactory
+DetectorFactory.seed = 0  # Para que los resultados sean reproducibles
+
+# 🧠 Conexión con modelos de IA
+import openai
+import google.generativeai as genai
+
+# 🧪 Carga segura de claves
+from dotenv import load_dotenv
+
+# 📈 Visualización profesional
+import streamlit as st
+import matplotlib.pyplot as plt
+
+# 🎲 Reproducibilidad en análisis aleatorios
+import random
+random.seed(42)
+
+# ====================================================
+# 1.1 🔐 Carga de claves de OpenAI y Gemini desde `.env` o desde Secrets
+# ====================================================
+#
+# Esta app en Streamlit se ejecuta de forma segura y privada gracias a un sistema mixto de carga de claves:
+#
+# 1. Primero intenta cargar un archivo `.env` en la raíz del proyecto, que debe contener las variables:
+#     - OPENAI_API_KEY
+#     - GOOGLE_API_KEY
+#
+# 2. Si el archivo `.env` no está disponible (por ejemplo, en entorno cloud como Codespaces),
+#    intentará recuperar las claves desde las variables de entorno (Secrets), al estilo de Colab o Kaggle.
+#
+# Este enfoque garantiza:
+#   ✅ Seguridad (las claves no se exponen directamente en el código)
+#   ✅ Compatibilidad con ejecución local, cloud, Codespaces y notebooks públicos
+#
+# ---
+#
+# ⚠️ MUY IMPORTANTE
+# - Si estás ejecutando esta app por primera vez, asegúrate de tener un archivo `.env` con tus claves.
+# - También puedes definir tus claves como Secrets en el repositorio (GitHub → Settings → Secrets → Actions).
+# - ❌ Si no se encuentran las claves, las llamadas a la API fallarán al analizar los comentarios.
+
+from dotenv import load_dotenv
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+if not OPENAI_API_KEY:
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+    if OPENAI_API_KEY:
+        st.info("🔐 OPENAI_API_KEY cargada desde entorno (Secrets / Codespaces).")
+
+if not GOOGLE_API_KEY:
+    GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+    if GOOGLE_API_KEY:
+        st.info("🔐 GOOGLE_API_KEY cargada desde entorno (Secrets / Codespaces).")
+
+if OPENAI_API_KEY and GOOGLE_API_KEY:
+    st.success("✅ Claves API cargadas correctamente.")
+else:
+    st.warning("⚠️ No se han encontrado todas las claves necesarias. Revisa tu archivo `.env` o tus Secrets.")
+
+# ====================================================
+# 🛰️ 2. Descarga automática de archivos desde GitHub
+# ====================================================
+
+import subprocess
+
+REPO_URL = "https://github.com/AraceliFradejas/Capstone-Project---Desarrollador10x-IIA---Araceli-Fradejas.git"
+DATA_FOLDER = "data"
+
+if not os.path.exists(DATA_FOLDER):
     try:
-        # Rutas de posibles ubicaciones de los archivos
-        rutas_txt_posibles = [
-            "comentarios.txt",  # Directorio actual
-            "./comentarios.txt",
-            "../comentarios.txt",
-            "/workspaces/kelcets-dashboard/comentarios.txt",  # Ajusta esta ruta a tu Codespace
-            "BD Comentarios KelceTS.txt",
-            "./BD Comentarios KelceTS.txt",
-            "/workspaces/kelcets-dashboard/BD Comentarios KelceTS.txt",
-            "comentarios_kelcets.txt",
-            "./comentarios_kelcets.txt"
-        ]
-        
-        # Intentar cargar desde cada ruta posible
-        comentarios = None
-        archivo_cargado = None
-        
-        for ruta in rutas_txt_posibles:
-            try:
-                st.sidebar.text(f"Intentando cargar: {ruta}")
-                if os.path.exists(ruta):
-                    # Cargar los datos desde el archivo de texto
-                    with open(ruta, 'r', encoding='utf-8') as f:
-                        contenido = f.read()
-                    
-                    # Dividir el contenido en comentarios (ajusta según el formato de tu archivo)
-                    comentarios = [comment.strip() for comment in contenido.split('\n\n') if comment.strip()]
-                    
-                    archivo_cargado = ruta
-                    st.sidebar.success(f"Datos cargados desde: {ruta}")
-                    st.sidebar.text(f"Total de comentarios: {len(comentarios)}")
-                    break
-            except Exception as e:
-                st.sidebar.error(f"Error al cargar {ruta}: {e}")
-        
-        if comentarios is None:
-            # Si no se pudo cargar el archivo, mostrar los archivos disponibles en el directorio
-            st.sidebar.warning("No se pudo cargar el archivo. Archivos disponibles:")
-            try:
-                archivos = os.listdir(".")
-                for archivo in archivos:
-                    st.sidebar.text(f" - {archivo}")
-            except:
-                st.sidebar.error("No se pudo listar los archivos")
-            
-            # Usar datos simulados como respaldo
-            st.warning("⚠️ Usando datos simulados como respaldo")
-            comentarios = [
-                "Ejemplo de comentario 1",
-                "Ejemplo de comentario 2",
-                "Ejemplo de comentario 3",
-                "Ejemplo de comentario 4",
-                "Ejemplo de comentario 5"
-            ]
-        
-        # Procesar comentarios y crear DataFrames simulados
-        # Esto es una simulación - ajusta según el formato real de tus comentarios
-        data_resumen = {
-            'ID': list(range(1, len(comentarios) + 1)),
-            'Comentario_Original': comentarios,
-            'Idioma': ['español', 'alemán', 'español', 'finés', 'portugués'] * ((len(comentarios) // 5) + 1),
-            'Valoracion': ['positiva', 'negativa', 'positiva', 'negativa', 'neutra'] * ((len(comentarios) // 5) + 1),
-            'Envio_96h': ['sí', 'no', 'sí', 'no', 'no mencionado'] * ((len(comentarios) // 5) + 1),
-            'Embalaje_Danado': ['no', 'sí', 'no', 'no', 'no mencionado'] * ((len(comentarios) // 5) + 1),
-            'Talla_Correcta': ['sí', 'no', 'sí', 'no', 'no mencionado'] * ((len(comentarios) // 5) + 1),
-            'Materiales_Calidad': ['sí', 'no', 'parcialmente', 'no', 'no mencionado'] * ((len(comentarios) // 5) + 1),
-            'Tipo_Uso': ['diario', 'ocasional', 'diario', 'ocasional', 'no mencionado'] * ((len(comentarios) // 5) + 1),
-            'Cumple_Expectativas': ['sí', 'no', 'parcialmente', 'no', 'no mencionado'] * ((len(comentarios) // 5) + 1)
-        }
-        
-        # Recortar listas al tamaño de comentarios
-        for key in data_resumen:
-            if key != 'ID' and key != 'Comentario_Original':
-                data_resumen[key] = data_resumen[key][:len(comentarios)]
-        
-        # Crear estadísticas a partir de los datos
-        valoraciones_positivas = data_resumen['Valoracion'].count('positiva')
-        valoraciones_negativas = data_resumen['Valoracion'].count('negativa')
-        valoraciones_neutras = data_resumen['Valoracion'].count('neutra')
-        problemas_materiales = data_resumen['Materiales_Calidad'].count('no')
-        problemas_talla = data_resumen['Talla_Correcta'].count('no')
-        problemas_envio = data_resumen['Envio_96h'].count('no')
-        problemas_embalaje = data_resumen['Embalaje_Danado'].count('sí')
-        
-        data_estadisticas = {
-            'Métrica': [
-                'Total Comentarios',
-                'Valoraciones Positivas',
-                'Valoraciones Negativas',
-                'Valoraciones Neutras',
-                'Problemas de Calidad Materiales',
-                'Problemas de Talla',
-                'Problemas de Envío',
-                'Problemas de Embalaje',
-                'Satisfacción General (%)'
-            ],
-            'Valor': [
-                len(comentarios),
-                valoraciones_positivas,
-                valoraciones_negativas,
-                valoraciones_neutras,
-                problemas_materiales,
-                problemas_talla,
-                problemas_envio,
-                problemas_embalaje,
-                round(valoraciones_positivas / len(comentarios) * 100 if len(comentarios) > 0 else 0, 2)
-            ]
-        }
-        
-        df = pd.DataFrame(data_resumen)
-        df_comunicaciones = pd.DataFrame({
-            'ID': df['ID'],
-            'Comentario_Original': df['Comentario_Original'],
-            'Email_Cliente': ['Email simulado para cliente ' + str(i) for i in range(1, len(comentarios) + 1)]
-        })
-        df_estadisticas = pd.DataFrame(data_estadisticas)
-        
-        return df, df_comunicaciones, df_estadisticas, (archivo_cargado is not None)
-        
+        subprocess.run(["git", "clone", REPO_URL], check=True)
+        # Mover la carpeta /data desde el repo clonado
+        clonado = "Capstone-Project---Desarrollador10x-IIA---Araceli-Fradejas"
+        if os.path.exists(os.path.join(clonado, DATA_FOLDER)):
+            os.rename(os.path.join(clonado, DATA_FOLDER), DATA_FOLDER)
+        st.success("📥 Archivos cargados correctamente desde GitHub.")
     except Exception as e:
-        st.error(f"Error en la función cargar_datos: {e}")
-        import traceback
-        st.error(traceback.format_exc())
-        return None, None, None, False
+        st.error(f"❌ Error al clonar los archivos desde GitHub: {e}")
+else:
+    st.info("ℹ️ Carpeta /data ya existe. No se vuelve a clonar.")
+
+
+# ====================================================
+# 📂 3. Carga de comentarios desde /data
+# ====================================================
+
+st.markdown("## 📂 Análisis de Comentarios de Clientes")
+st.markdown("Se cargan automáticamente los comentarios desde el archivo `BD Comentarios KelceTS.txt` ubicado en `/data`.")
+
+comentarios_path = os.path.join("data", "BD Comentarios KelceTS.txt")
+
+# Verificar si el archivo existe
+if os.path.exists(comentarios_path):
+    with open(comentarios_path, "r", encoding="utf-8") as file:
+        comentarios = [line.strip() for line in file if line.strip()]
+
+    num_comentarios = len(comentarios)
+    st.success(f"✅ Se han cargado {num_comentarios} comentarios correctamente.")
+
+    # Mostrar una muestra aleatoria
+    st.subheader("📌 Muestra aleatoria de comentarios")
+    muestra = random.sample(comentarios, min(5, num_comentarios))
+    for idx, comentario in enumerate(muestra, 1):
+        st.markdown(f"**{idx}.** {comentario}")
+
+else:
+    st.error("❌ No se encontró el archivo `BD Comentarios KelceTS.txt` en la carpeta /data.")
+
+# ====================================================
+# 🌍 4strea. Análisis de idiomas de los comentarios
+# ====================================================
+
+st.subheader("🌐 Distribución de idiomas detectados")
+
+# Detección automática con langdetect
+idiomas = [detect(comentario) for comentario in comentarios]
+
+# Crear DataFrame para análisis
+df_idiomas = pd.DataFrame({"comentario": comentarios, "idioma": idiomas})
+
+# Contar ocurrencias por idioma
+conteo_idiomas = df_idiomas["idioma"].value_counts().reset_index()
+conteo_idiomas.columns = ["Idioma", "Cantidad"]
+
+# Mostrar tabla
+st.dataframe(conteo_idiomas, use_container_width=True)
+
+# Mostrar gráfico de barras
+fig, ax = plt.subplots()
+ax.bar(conteo_idiomas["Idioma"], conteo_idiomas["Cantidad"])
+ax.set_xlabel("Idioma")
+ax.set_ylabel("Número de comentarios")
+ax.set_title("Distribución de idiomas en comentarios")
+st.pyplot(fig)
+
