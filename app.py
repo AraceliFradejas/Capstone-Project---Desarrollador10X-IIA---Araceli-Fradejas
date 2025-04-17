@@ -176,7 +176,7 @@ else:
     st.error("❌ No se encontró el archivo `BD Comentarios KelceTS.txt` en la carpeta /data.")
 
 # ====================================================
-# 🌍 4strea. Análisis de idiomas de los comentarios
+# 🌍 4. Análisis de idiomas de los comentarios
 # ====================================================
 
 st.subheader("🌐 Distribución de idiomas detectados")
@@ -202,3 +202,106 @@ ax.set_ylabel("Número de comentarios")
 ax.set_title("Distribución de idiomas en comentarios")
 st.pyplot(fig)
 
+# ====================================================
+# 📥 5. Carga de Reglas Internas desde archivos Excel
+# ====================================================
+st.markdown("## 📥 Reglas de Calidad, Logística y Evaluación")
+st.markdown("Se cargan desde el directorio `/data` las reglas internas definidas por KelceTS S.L. para analizar los comentarios y generar respuestas automatizadas.")
+
+# Diccionario para almacenar los DataFrames
+reglas = {}
+
+# Lista de archivos de reglas
+archivos_reglas = {
+    "valoracion": "Reglas de como valorar un comentario KelceTS SL.xlsx",
+    "clientes": "Reglas de calidad clientes KelceTS SL.xlsx",
+    "logistica": "Reglas de comunicaciones equipos calidad y logistica KelceTS SL.xlsx",
+    "medidas": "Reglas de medidas de calidad KelceTS SL.xlsx"
+}
+
+# Cargar todos los archivos
+for clave, nombre_archivo in archivos_reglas.items():
+    ruta = os.path.join("data", nombre_archivo)
+    if os.path.exists(ruta):
+        reglas[clave] = pd.read_excel(ruta)
+        st.success(f"✅ Regla '{clave}' cargada correctamente.")
+    else:
+        st.warning(f"⚠️ No se encontró el archivo '{nombre_archivo}' en /data.")
+
+# Mostrar contenido resumido
+for clave, df in reglas.items():
+    st.subheader(f"📄 Vista previa: reglas {clave}")
+    st.dataframe(df.head(), use_container_width=True)
+
+# ====================================================
+# 🤖 6. Clasificación automática de comentarios
+# ====================================================
+st.markdown("## 🤖 Clasificación Automática de Comentarios")
+st.markdown("Se analizan los comentarios usando IA y las reglas de negocio para generar valoraciones y determinar las acciones necesarias.")
+
+from langdetect.lang_detect_exception import LangDetectException
+
+def clasificar_comentario(texto):
+    resultado = {
+        "idioma": "desconocido",
+        "recibido_96h": "no especifica",
+        "embalaje_dañado": "no especifica",
+        "talla_correcta": "no especifica",
+        "material_bueno": "no especifica",
+        "uso": "no especifica",
+        "cumple_expectativas": "sí",  # asumimos sí si no hay lo contrario
+        "valoracion_global": "positiva"
+    }
+
+    # Idioma
+    try:
+        lang = detect(texto)
+        resultado["idioma"] = lang
+    except LangDetectException:
+        resultado["idioma"] = "desconocido"
+
+    # Reglas simplificadas (puedes afinarlas más si lo deseas)
+    texto_lower = texto.lower()
+
+    if "96" in texto_lower or "cuatro días" in texto_lower or "tardó" in texto_lower:
+        resultado["recibido_96h"] = "no"
+        resultado["cumple_expectativas"] = "no"
+
+    if "embalaje" in texto_lower or "caja" in texto_lower and ("roto" in texto_lower or "abollado" in texto_lower):
+        resultado["embalaje_dañado"] = "sí"
+        resultado["cumple_expectativas"] = "no"
+
+    if any(palabra in texto_lower for palabra in ["grande", "pequeñ", "talla equivocada", "molestias", "incómodas"]):
+        resultado["talla_correcta"] = "no"
+        resultado["cumple_expectativas"] = "no"
+
+    if any(palabra in texto_lower for palabra in ["plasticosas", "desgastan", "rompen", "descosen", "mala calidad"]):
+        resultado["material_bueno"] = "no"
+        resultado["cumple_expectativas"] = "no"
+
+    if any(palabra in texto_lower for palabra in ["diario", "cada día", "todos los días"]):
+        resultado["uso"] = "frecuente"
+    elif any(palabra in texto_lower for palabra in ["ocasional", "solo deporte"]):
+        resultado["uso"] = "ocasional"
+
+    # Valoración global
+    if resultado["cumple_expectativas"] == "no":
+        resultado["valoracion_global"] = "negativa"
+    elif any(v == "no especifica" for v in resultado.values()):
+        resultado["valoracion_global"] = "neutra"
+
+    return resultado
+
+# Aplicamos la función a todos los comentarios
+datos_clasificados = [clasificar_comentario(c) for c in comentarios]
+df_clasificados = pd.DataFrame(datos_clasificados)
+df_clasificados["comentario"] = comentarios
+
+# Mostramos tabla resumen
+st.subheader("📊 Resultados del Análisis de Comentarios")
+st.dataframe(df_clasificados.head(10), use_container_width=True)
+
+# Resumen por tipo de valoración
+st.markdown("### 📈 Distribución de Valoración Global")
+val_counts = df_clasificados["valoracion_global"].value_counts()
+st.bar_chart(val_counts)
