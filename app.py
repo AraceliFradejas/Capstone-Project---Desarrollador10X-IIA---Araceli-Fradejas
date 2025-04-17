@@ -372,3 +372,43 @@ st.markdown("### 📈 Distribución de comunicaciones generadas")
 comunicaciones_count = df_clasificados["comunicacion_recomendada"].value_counts()
 st.bar_chart(comunicaciones_count)
 
+# ====================================================
+# 7. 📊 Panel de Métricas Estratégicas para Dirección (CEO)
+# ====================================================
+st.markdown("""
+## 📊 Panel Estratégico para Dirección
+
+Este panel resume los resultados globales del análisis automatizado y ofrece métricas clave para la toma de decisiones por parte de la Dirección y el CEO de KelceTS S.L.
+""")
+
+# Total de comentarios analizados
+total_comentarios = len(df_clasificados)
+st.metric(label="📃 Comentarios analizados", value=total_comentarios)
+
+# Distribución de valoración global
+st.markdown("### 🔄 Distribución de Valoraciones")
+st.bar_chart(df_clasificados["valoracion_global"].value_counts())
+
+# Porcentaje de comentarios negativos
+negativos = (df_clasificados["valoracion_global"] == "negativa").sum()
+porcentaje_negativos = (negativos / total_comentarios) * 100
+st.metric(label="🚫 % de comentarios negativos", value=f"{porcentaje_negativos:.2f}%")
+
+# Idiomas más frecuentes
+st.markdown("### 🌐 Idiomas más frecuentes")
+idiomas_top = df_clasificados["idioma"].value_counts().head(5)
+st.dataframe(idiomas_top.reset_index().rename(columns={"index": "Idioma", "idioma": "Cantidad"}))
+
+# Distribución de comunicaciones generadas
+st.markdown("### 📧 Tipo de comunicaciones generadas")
+st.bar_chart(df_clasificados["comunicacion_recomendada"].value_counts())
+
+# Estimación de costes evitados
+st.markdown("### 💸 Coste estimado de gestión manual evitado")
+# Supongamos que cada comunicación manual cuesta 3€ (cliente), 5€ (interna), 7€ (proveedor)
+coste_total = 0
+for tipo, coste in [("✅ Respuesta al cliente", 3), ("📦 Notificación interna (logística/calidad)", 5), ("🤝 Comunicación formal a proveedor", 7)]:
+    count = df_clasificados["comunicacion_recomendada"].str.contains(tipo).sum()
+    coste_total += count * coste
+
+st.metric(label="💰 Ahorro estimado por automatización", value=f"{coste_total:.2f} €")
