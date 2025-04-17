@@ -7,3 +7,4 @@ langdetect
 openai
 google-generativeai
 python-dotenv
+openpyxl
