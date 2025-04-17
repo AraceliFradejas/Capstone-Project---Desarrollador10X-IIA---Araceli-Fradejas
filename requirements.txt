@@ -3,8 +3,10 @@ pandas==2.2.2
 plotly==5.24.1
 matplotlib==3.10.0
 seaborn==0.13.2
+numpy==1.26.4
 langdetect
 openai
 google-generativeai
 python-dotenv
 openpyxl
+reportlab
