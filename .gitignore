@@ -1,0 +1,6 @@
+# Ignorar entorno virtual (si lo usas)
+venv/
+__pycache__/
+
+# Ignorar claves secretas
+.env
