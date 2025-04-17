@@ -51,6 +51,35 @@ sobre los comentarios que los clientes dejan en diferentes idiomas y canales (em
 # - Cálculo de métricas e indicadores clave (KPIs)
 # - Visualización gráfica e interactiva en Streamlit
 # - Conexión con modelos de lenguaje (OpenAI y Gemini)
+# 
+#
+# ================================================
+# 🛠️ Instalación automática de paquetes (opcional)
+# ================================================
+
+import streamlit as st  
+import subprocess
+import sys
+
+def instalar_paquete(paquete):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", paquete])
+
+paquetes_necesarios = [
+    "openai",
+    "google-generativeai",
+    "langdetect",
+    "python-dotenv",
+    "pandas",
+    "matplotlib",
+    "streamlit"
+]
+
+for paquete in paquetes_necesarios:
+    try:
+        __import__(paquete.split("=")[0].replace("-", "_"))
+    except ImportError:
+        instalar_paquete(paquete)
+
 
 # 💾 Gestión del sistema
 import os
@@ -234,13 +263,29 @@ for clave, df in reglas.items():
     st.dataframe(df.head(), use_container_width=True)
 
 # ====================================================
-# 🤖 6. Clasificación automática de comentarios
+# 🤖 6. Clasificación y comunicaciones automáticas
 # ====================================================
-st.markdown("## 🤖 Clasificación Automática de Comentarios")
-st.markdown("Se analizan los comentarios usando IA y las reglas de negocio para generar valoraciones y determinar las acciones necesarias.")
+
+st.markdown("""
+### 🤖 Clasificación y comunicaciones automáticas
+
+Esta sección aplica reglas de negocio sobre cada comentario de cliente para:
+
+- Detectar si el comentario es negativo o neutro
+- Analizar aspectos clave (entrega, embalaje, talla, materiales, uso)
+- Determinar si se requiere:
+  - ✅ Respuesta al cliente
+  - 📦 Notificación interna a equipos
+  - 🤝 Comunicación formal a proveedor
+
+Además, se muestra un resumen visual del tipo de comunicaciones generadas para su análisis estratégico.
+""")
 
 from langdetect.lang_detect_exception import LangDetectException
 
+# --------------------------------------
+# 6.1 🧠 Clasificación del comentario
+# --------------------------------------
 def clasificar_comentario(texto):
     resultado = {
         "idioma": "desconocido",
@@ -260,28 +305,28 @@ def clasificar_comentario(texto):
     except LangDetectException:
         resultado["idioma"] = "desconocido"
 
-    # Reglas simplificadas (puedes afinarlas más si lo deseas)
+    # Reglas simplificadas
     texto_lower = texto.lower()
 
     if "96" in texto_lower or "cuatro días" in texto_lower or "tardó" in texto_lower:
         resultado["recibido_96h"] = "no"
         resultado["cumple_expectativas"] = "no"
 
-    if "embalaje" in texto_lower or "caja" in texto_lower and ("roto" in texto_lower or "abollado" in texto_lower):
+    if "embalaje" in texto_lower or ("caja" in texto_lower and ("roto" in texto_lower or "abollado" in texto_lower)):
         resultado["embalaje_dañado"] = "sí"
         resultado["cumple_expectativas"] = "no"
 
-    if any(palabra in texto_lower for palabra in ["grande", "pequeñ", "talla equivocada", "molestias", "incómodas"]):
+    if any(p in texto_lower for p in ["grande", "pequeñ", "talla equivocada", "molestias", "incómodas"]):
         resultado["talla_correcta"] = "no"
         resultado["cumple_expectativas"] = "no"
 
-    if any(palabra in texto_lower for palabra in ["plasticosas", "desgastan", "rompen", "descosen", "mala calidad"]):
+    if any(p in texto_lower for p in ["plasticosas", "desgastan", "rompen", "descosen", "mala calidad"]):
         resultado["material_bueno"] = "no"
         resultado["cumple_expectativas"] = "no"
 
-    if any(palabra in texto_lower for palabra in ["diario", "cada día", "todos los días"]):
+    if any(p in texto_lower for p in ["diario", "cada día", "todos los días"]):
         resultado["uso"] = "frecuente"
-    elif any(palabra in texto_lower for palabra in ["ocasional", "solo deporte"]):
+    elif any(p in texto_lower for p in ["ocasional", "solo deporte"]):
         resultado["uso"] = "ocasional"
 
     # Valoración global
@@ -292,16 +337,38 @@ def clasificar_comentario(texto):
 
     return resultado
 
-# Aplicamos la función a todos los comentarios
+# --------------------------------------
+# 6.2 📬 Generación de comunicaciones
+# --------------------------------------
+def generar_comunicaciones(info):
+    comunicaciones = []
+
+    if info["valoracion_global"] == "negativa":
+        comunicaciones.append("✅ Respuesta al cliente")
+
+    if info["recibido_96h"] == "no" or info["embalaje_dañado"] == "sí" or info["talla_correcta"] == "no":
+        comunicaciones.append("📦 Notificación interna (logística/calidad)")
+
+    if info["material_bueno"] == "no" or info["cumple_expectativas"] == "no":
+        comunicaciones.append("🤝 Comunicación formal a proveedor")
+
+    return ", ".join(comunicaciones) if comunicaciones else "Sin comunicación necesaria"
+
+# --------------------------------------
+# 6.3🧪 Aplicar clasificación y generar tabla
+# --------------------------------------
 datos_clasificados = [clasificar_comentario(c) for c in comentarios]
 df_clasificados = pd.DataFrame(datos_clasificados)
 df_clasificados["comentario"] = comentarios
+df_clasificados["comunicacion_recomendada"] = df_clasificados.apply(generar_comunicaciones, axis=1)
 
-# Mostramos tabla resumen
-st.subheader("📊 Resultados del Análisis de Comentarios")
-st.dataframe(df_clasificados.head(10), use_container_width=True)
+# --------------------------------------
+# 6.4 📊 Visualización en la app
+# --------------------------------------
+st.subheader("📊 Tabla con clasificación y comunicaciones generadas")
+st.dataframe(df_clasificados[["comentario", "valoracion_global", "comunicacion_recomendada"]], use_container_width=True)
 
-# Resumen por tipo de valoración
-st.markdown("### 📈 Distribución de Valoración Global")
-val_counts = df_clasificados["valoracion_global"].value_counts()
-st.bar_chart(val_counts)
+st.markdown("### 📈 Distribución de comunicaciones generadas")
+comunicaciones_count = df_clasificados["comunicacion_recomendada"].value_counts()
+st.bar_chart(comunicaciones_count)
+
