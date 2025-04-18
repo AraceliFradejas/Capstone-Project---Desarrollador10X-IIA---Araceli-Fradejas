@@ -1,3 +1,38 @@
+"""
+🧠 Capstone Project - Dashboard Estratégico de Comentarios (KelceTS S.L.)
+Instituto de Inteligencia Artificial - Curso Desarrollador 10x
+
+👤 Estudiante: Araceli Fradejas Muñoz  
+📅 Fecha de entrega: 21/04/2025
+
+📄 Descripción del Proyecto:
+KelceTS S.L. es una startup ficticia especializada en la venta de zapatillas online en Europa.
+
+Este dashboard ha sido diseñado para ofrecer a la Dirección y al CEO una **visión analítica y estratégica** 
+sobre los comentarios que los clientes dejan en diferentes idiomas y canales (email, redes sociales, etc.).
+
+🎯 Objetivos de la App:
+- Visualizar el volumen y evolución de comentarios recibidos
+- Analizar las temáticas predominantes (logística, calidad, otros)
+- Detectar idiomas más frecuentes y distribución geográfica
+- Medir el número de comunicaciones generadas (cliente, logística, proveedor)
+- Estimar costes de respuesta manual vs automática con IA
+- Facilitar decisiones estratégicas basadas en datos en tiempo real
+
+🔐 Gestión de claves:
+- Carga segura de claves OpenAI y Gemini mediante archivo `.env` (NO se sube a GitHub)
+- Fallback automático a Gemini (Google Cloud) si OpenAI no responde
+
+📁 Datos utilizados desde el directorio `/data` del repositorio:
+- BD Comentarios KelceTS.txt
+- Reglas de calidad, logística, clientes y proveedores
+
+💡 Impacto esperado:
+- Mayor conocimiento de incidencias recurrentes
+- Optimización del proceso de atención al cliente
+- Visión ejecutiva sobre el uso de IA en el análisis multilingüe de clientes
+- Apoyo a decisiones estratégicas con métricas visuales y automáticas
+"""
 import streamlit as st
 import os
 import pandas as pd
@@ -387,14 +422,15 @@ def generar_pdf_completo(df, metricas):
     
     # Generar y guardar gráfico de valoraciones
     fig_valoraciones = generar_grafico_valoraciones(df)
+    # Mayor resolución para mejor calidad en PDF
     gráfico_val_path = "/tmp/grafico_valoraciones.png"
-    fig_valoraciones.write_image(gráfico_val_path, width=600, height=350)
+    fig_valoraciones.write_image(gráfico_val_path, width=1200, height=700, scale=2)
     
     # Añadir imagen del gráfico
     c.drawImage(gráfico_val_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
     
     # Footer en primera página
-    c.setFont("Helvetica-Italic", 8)
+    c.setFont("Helvetica", 8) # Cambiamos de Helvetica-Italic a Helvetica
     c.setFillColor(color_gris)
     c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 1/3")
     c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
@@ -429,7 +465,8 @@ def generar_pdf_completo(df, metricas):
     fig_idiomas = generar_grafico_idiomas(df)
     if fig_idiomas:
         gráfico_idiomas_path = "/tmp/grafico_idiomas.png"
-        fig_idiomas.write_image(gráfico_idiomas_path, width=600, height=350)
+        # Mayor resolución para mejor calidad en PDF
+        fig_idiomas.write_image(gráfico_idiomas_path, width=1200, height=700, scale=2)
         # Añadir imagen del gráfico
         c.drawImage(gráfico_idiomas_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
     
@@ -444,13 +481,14 @@ def generar_pdf_completo(df, metricas):
     # Generar y guardar gráfico de comunicaciones
     fig_comunicaciones = generar_grafico_comunicaciones(df)
     gráfico_com_path = "/tmp/grafico_comunicaciones.png"
-    fig_comunicaciones.write_image(gráfico_com_path, width=600, height=350)
+    # Mayor resolución para mejor calidad en PDF
+    fig_comunicaciones.write_image(gráfico_com_path, width=1200, height=700, scale=2)
     
     # Añadir imagen del gráfico
     c.drawImage(gráfico_com_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
     
     # Footer en segunda página
-    c.setFont("Helvetica-Italic", 8)
+    c.setFont("Helvetica", 8) # Cambiamos de Helvetica-Italic a Helvetica
     c.setFillColor(color_gris)
     c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 2/3")
     c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
@@ -484,7 +522,8 @@ def generar_pdf_completo(df, metricas):
     # Generar y guardar gráfico de variables de calidad
     fig_calidad = generar_grafico_calidad(df)
     gráfico_cal_path = "/tmp/grafico_calidad.png"
-    fig_calidad.write_image(gráfico_cal_path, width=600, height=400)
+    # Mayor resolución para mejor calidad en PDF
+    fig_calidad.write_image(gráfico_cal_path, width=1200, height=800, scale=2)
     
     # Añadir imagen del gráfico
     c.drawImage(gráfico_cal_path, x=1*cm, y=y_pos-9*cm, width=width-2*cm, height=8*cm)
@@ -533,13 +572,13 @@ def generar_pdf_completo(df, metricas):
     
     # Información de fecha y autor
     y_pos -= (len(conclusiones) + 2) * 0.6*cm
-    c.setFont("Helvetica-Italic", 9)
+    c.setFont("Helvetica", 9)  # Cambiamos de Helvetica-Italic a Helvetica
     c.drawString(1*cm, y_pos, f"Informe generado el {datetime.now().strftime('%d/%m/%Y')} - Análisis automatizado por KelceTS S.L.")
     
     # Footer en tercera página
-    c.setFont("Helvetica-Italic", 8)
+    c.setFont("Helvetica", 8)  # Cambiamos de Helvetica-Italic a Helvetica
     c.setFillColor(color_gris)
-    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 3/3")
+    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente por Araceli Fradejas Muñoz | Página 3/3")
     c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
     
     c.save()
