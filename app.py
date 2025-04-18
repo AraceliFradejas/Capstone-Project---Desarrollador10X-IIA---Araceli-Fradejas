@@ -333,6 +333,9 @@ def generar_pdf_completo(df, metricas):
     c = canvas.Canvas(buffer, pagesize=page_size)
     width, height = page_size
     
+    # Configurar título del documento PDF
+    c.setTitle("Informe_Ejecutivo_KelceTS")
+    
     # Colores corporativos KelceTS y Chiefs
     color_rojo = colors.Color(int(CHIEFS_RED[1:3], 16)/255, int(CHIEFS_RED[3:5], 16)/255, int(CHIEFS_RED[5:7], 16)/255)
     color_amarillo = colors.Color(int(CHIEFS_YELLOW[1:3], 16)/255, int(CHIEFS_YELLOW[3:5], 16)/255, int(CHIEFS_YELLOW[5:7], 16)/255)
@@ -411,7 +414,8 @@ def generar_pdf_completo(df, metricas):
     w, h = table.wrap(width, height)
     table.drawOn(c, 1*cm, y_pos-h)
     
-    y_pos -= 4*cm
+    # Añadir más espacio después de la tabla
+    y_pos -= 5*cm
     
     # Gráfico de valoraciones
     c.setFont("Helvetica-Bold", 14)
@@ -430,9 +434,9 @@ def generar_pdf_completo(df, metricas):
     c.drawImage(gráfico_val_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
     
     # Footer en primera página
-    c.setFont("Helvetica", 8) # Cambiamos de Helvetica-Italic a Helvetica
+    c.setFont("Helvetica", 8)
     c.setFillColor(color_gris)
-    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 1/3")
+    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente por Araceli Fradejas Muñoz | Página 1/3")
     c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
     
     # -------- PÁGINA 2: GRÁFICOS DE IDIOMAS Y COMUNICACIONES --------
@@ -488,9 +492,9 @@ def generar_pdf_completo(df, metricas):
     c.drawImage(gráfico_com_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
     
     # Footer en segunda página
-    c.setFont("Helvetica", 8) # Cambiamos de Helvetica-Italic a Helvetica
+    c.setFont("Helvetica", 8)
     c.setFillColor(color_gris)
-    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 2/3")
+    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente por Araceli Fradejas Muñoz | Página 2/3")
     c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
     
     # -------- PÁGINA 3: ANÁLISIS DE VARIABLES DE CALIDAD --------
@@ -536,9 +540,10 @@ def generar_pdf_completo(df, metricas):
     c.setFillColor(color_rojo)
     c.rect(1*cm, y_pos-0.3*cm, 5.5*cm, 0.1*cm, fill=True)
     
-    # Texto con conclusiones
+    # Texto con conclusiones - USANDO COLOR NEGRO
     y_pos -= 1*cm
     c.setFont("Helvetica", 10)
+    c.setFillColor(color_negro)  # Establecer color negro para las conclusiones
     
     # Determinar recomendaciones basadas en los datos
     total = metricas['total_comentarios']
@@ -572,11 +577,11 @@ def generar_pdf_completo(df, metricas):
     
     # Información de fecha y autor
     y_pos -= (len(conclusiones) + 2) * 0.6*cm
-    c.setFont("Helvetica", 9)  # Cambiamos de Helvetica-Italic a Helvetica
+    c.setFont("Helvetica", 9)
     c.drawString(1*cm, y_pos, f"Informe generado el {datetime.now().strftime('%d/%m/%Y')} - Análisis automatizado por KelceTS S.L.")
     
     # Footer en tercera página
-    c.setFont("Helvetica", 8)  # Cambiamos de Helvetica-Italic a Helvetica
+    c.setFont("Helvetica", 8)
     c.setFillColor(color_gris)
     c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente por Araceli Fradejas Muñoz | Página 3/3")
     c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
