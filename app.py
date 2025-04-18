@@ -33,66 +33,51 @@ CHIEFS_RED_DARK = "#B30E29"  # Versión más oscura para hover
 # Aplicar estilos personalizados al sidebar y a los componentes
 st.markdown(f"""
 <style>
-    /* Estilo para el sidebar */
-    .css-1d391kg, [data-testid="stSidebar"] {{
-        background-color: {CHIEFS_YELLOW};
+    /* Estilo para el sidebar - fondo negro */
+    .css-1d391kg, [data-testid="stSidebar"], .css-1cypcdb, .css-1nm2qww, .css-1mbkxta {{
+        background-color: black !important;
     }}
     
-    /* Estilo para los botones */
-    .stButton>button {{
-        background-color: {CHIEFS_RED};
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 0.5rem 1rem;
-        font-weight: bold;
+    /* Estilo para el texto en el sidebar */
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] h4 {{
+        color: white !important;
     }}
     
-    .stButton>button:hover {{
-        background-color: {CHIEFS_RED_DARK};
-    }}
-    
-    /* Estilo para elementos de radio button */
-    .stRadio [role=radiogroup] {{
-        border-radius: 4px;
-        padding: 10px;
-    }}
-    
-    /* Estilo para el texto de los radio buttons */
-    .stRadio label span p {{
-        color: {CHIEFS_RED} !important;
+    /* Estilo específico para las etiquetas de los radio buttons */
+    .stRadio label {{
+        color: white !important;
         font-weight: bold !important;
     }}
     
-    /* Cambiar el color del círculo de selección a rojo Chiefs */
-    .stRadio input:checked + div svg {{
-        fill: {CHIEFS_RED} !important;
-        color: {CHIEFS_RED} !important;
+    /* Estilo para el texto dentro de los radio buttons */
+    .stRadio label span {{
+        color: white !important;
     }}
     
-    .stRadio input:checked + div {{
-        border-color: {CHIEFS_RED} !important;
-        background-color: white !important;
+    /* Color para el círculo de los radio buttons */
+    .stRadio [data-baseweb="radio"] input:checked + div {{
+        border-color: #E31837 !important;
+        background-color: #E31837 !important;
     }}
     
-    /* Fondo rojo para la opción seleccionada */
-    .stRadio input:checked + div + label {{
-        background-color: {CHIEFS_RED}20 !important;  /* 20 es para la opacidad */
-        padding: 5px 10px !important;
-        border-radius: 4px !important;
-        display: inline-block !important;
-        width: 100% !important;
+    /* Estilo al pasar el mouse */
+    .stRadio [data-baseweb="radio"]:hover input + div {{
+        border-color: #E31837 !important;
     }}
     
-    /* Estilo cuando el radio button está seleccionado */
-    .stRadio input:checked + div + label span p {{
-        color: {CHIEFS_RED} !important;
+    /* Asegurarse de que el título del sidebar sea visible */
+    [data-testid="stSidebar"] h3 {{
+        color: #E31837 !important;
         font-weight: bold !important;
     }}
     
-    /* Ajuste para el botón de descarga */
-    .stDownloadButton>button {{
-        background-color: {CHIEFS_RED} !important;
+    /* Estilo para los botones (manteniendo tus colores) */
+    .stButton>button, .stDownloadButton>button {{
+        background-color: #E31837 !important;
         color: white !important;
         border: none !important;
         border-radius: 4px !important;
@@ -100,8 +85,8 @@ st.markdown(f"""
         font-weight: bold !important;
     }}
     
-    .stDownloadButton>button:hover {{
-        background-color: {CHIEFS_RED_DARK} !important;
+    .stButton>button:hover, .stDownloadButton>button:hover {{
+        background-color: #B30E29 !important;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -628,8 +613,8 @@ try:
     col2.metric("% Negativos", f"{porc_negativos:.2f}%")
     col3.metric("Coste estimado", f"{coste_total} €")
 
-    # Selector con estilo Chiefs personalizado
-    st.sidebar.markdown(f"<h3 style='color: {CHIEFS_RED}; font-weight: bold; margin-top: 15px;'>Tipo de visualización:</h3>", unsafe_allow_html=True)
+    # Selector con estilo Chiefs personalizado - título en negro
+    st.sidebar.markdown("<h3 style='color: black; font-weight: bold; margin-top: 15px;'>Tipo de visualización:</h3>", unsafe_allow_html=True)
     
     opciones = {
         "📈 Valoraciones": "📈 Distribución por valoración",
@@ -639,7 +624,12 @@ try:
     }
     
     # Radio button con el estilo aplicado a través del CSS definido al inicio
-    eleccion = st.sidebar.radio("", list(opciones.keys()))
+    # Se añade una etiqueta significativa y se oculta para resolver la advertencia de accesibilidad
+    eleccion = st.sidebar.radio(
+        "Opciones de visualización", 
+        list(opciones.keys()),
+        label_visibility="collapsed"  # Oculta la etiqueta pero mantiene la accesibilidad
+    )
     
     # Espacio entre secciones
     st.markdown("<hr style='margin-top: 15px; margin-bottom: 15px;'>", unsafe_allow_html=True)
