@@ -4,15 +4,89 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from io import BytesIO
+from plotly.subplots import make_subplots
 import urllib.request
+from io import BytesIO
 import tempfile
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
+from reportlab.lib.pagesizes import A4, letter
+from reportlab.lib.units import cm, inch
 from reportlab.lib import colors
+from reportlab.platypus import Paragraph, Image, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+import base64
+import time
+from datetime import datetime
 
-st.set_page_config(page_title="Dashboard Dirección KelceTS", layout="wide")
+# Configuración de la página con colores de los Chiefs
+st.set_page_config(
+    page_title="Dashboard Dirección KelceTS", 
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Colores de Kansas City Chiefs
+CHIEFS_RED = "#E31837"
+CHIEFS_YELLOW = "#FFB612"
+CHIEFS_RED_DARK = "#B30E29"  # Versión más oscura para hover
+
+# Aplicar estilos personalizados al sidebar y a los componentes
+st.markdown(f"""
+<style>
+    /* Estilo para el sidebar */
+    .css-1d391kg, [data-testid="stSidebar"] {{
+        background-color: {CHIEFS_YELLOW};
+    }}
+    
+    /* Estilo para los botones */
+    .stButton>button {{
+        background-color: {CHIEFS_RED};
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-weight: bold;
+    }}
+    
+    .stButton>button:hover {{
+        background-color: {CHIEFS_RED_DARK};
+    }}
+    
+    /* Estilo para elementos de radio button */
+    .stRadio [role=radiogroup] {{
+        border-radius: 4px;
+        padding: 10px;
+    }}
+    
+    .stRadio label span p {{
+        color: {CHIEFS_RED} !important;
+        font-weight: bold !important;
+    }}
+    
+    /* Ajuste para el botón de descarga */
+    .stDownloadButton>button {{
+        background-color: {CHIEFS_RED} !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: bold !important;
+    }}
+    
+    .stDownloadButton>button:hover {{
+        background-color: {CHIEFS_RED_DARK} !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
+# 🔐 Carga de claves API
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+except:
+    pass
 
 # Función para crear un DataFrame de ejemplo
 def crear_df_ejemplo():
@@ -76,8 +150,8 @@ def generar_grafico_calidad(df):
     # Color mapping para consistencia visual
     colores_valores = {
         "sí": "#28A745",  # Verde para valores positivos
-        "no": "#E31837",  # Rojo para valores negativos
-        "parcialmente": "#FFB612",  # Amarillo para valores parciales
+        "no": CHIEFS_RED,  # Rojo para valores negativos
+        "parcialmente": CHIEFS_YELLOW,  # Amarillo para valores parciales
         "no mencionado": "#6c757d"  # Gris para valores no mencionados
     }
     
@@ -101,61 +175,364 @@ def generar_grafico_calidad(df):
     
     return fig
 
-# Función para generar PDF mejorado
-def generar_pdf_mejorado(df, metricas):
-    """Genera un PDF ejecutivo mejorado con cabecera personalizada"""
+# Función para generar gráfico de valoraciones
+def generar_grafico_valoraciones(df):
+    """Genera el gráfico de distribución de valoraciones"""
+    df_plot = df["valoracion"].value_counts().reset_index()
+    df_plot.columns = ["Valoración", "Cantidad"]
+    
+    # Color mapping
+    colores_valoraciones = {
+        "negativa": CHIEFS_RED, 
+        "parcial": CHIEFS_YELLOW, 
+        "positiva": "#28A745", 
+        "neutra": "#7f7f7f"
+    }
+    
+    fig = px.bar(
+        df_plot, 
+        x="Valoración", 
+        y="Cantidad", 
+        color="Valoración", 
+        title="📈 Distribución por valoración",
+        color_discrete_map=colores_valoraciones
+    )
+    
+    fig.update_layout(
+        xaxis_title="Valoración",
+        yaxis_title="Número de comentarios"
+    )
+    
+    return fig
+
+# Función para generar gráfico de idiomas
+def generar_grafico_idiomas(df):
+    """Genera el gráfico de distribución por idioma"""
+    try:
+        df_agrupado = df.groupby("idioma")["valoracion"].value_counts().unstack().fillna(0)
+        for col in ["positiva", "negativa"]:
+            if col not in df_agrupado.columns:
+                df_agrupado[col] = 0
+        df_agrupado["total"] = df_agrupado.sum(axis=1)
+        df_agrupado["predominante"] = df_agrupado[["positiva", "negativa"]].idxmax(axis=1)
+        df_agrupado = df_agrupado.reset_index()
+        
+        # Banderas para idiomas
+        flags = {
+            "español": "🇪🇸", "alemán": "🇩🇪", "francés": "🇫🇷", "italiano": "🇮🇹", 
+            "portugués": "🇵🇹", "neerlandés": "🇳🇱", "polaco": "🇵🇱", "finlandés": "🇫🇮",
+            "sueco": "🇸🇪", "danés": "🇩🇰", "griego": "🇬🇷", "húngaro": "🇭🇺",
+            "checo": "🇨🇿", "rumano": "🇷🇴"
+        }
+        
+        df_agrupado["label"] = df_agrupado["idioma"].apply(lambda x: f"{flags.get(x, '')} {x}")
+        
+        # Color mapping
+        colores_valoraciones = {
+            "negativa": CHIEFS_RED, 
+            "parcial": CHIEFS_YELLOW, 
+            "positiva": "#28A745", 
+            "neutra": "#7f7f7f"
+        }
+        
+        fig = px.bar(
+            df_agrupado, 
+            x="label", 
+            y="total", 
+            text="total", 
+            color="predominante", 
+            title="🌍 Distribución por idioma con valoración dominante",
+            color_discrete_map=colores_valoraciones
+        )
+        
+        fig.update_traces(textposition="outside")
+        fig.update_layout(
+            xaxis_title="Idioma",
+            yaxis_title="Número de comentarios"
+        )
+        
+        return fig
+    except Exception as e:
+        st.error(f"Error en gráfico de idiomas: {e}")
+        return None
+
+# Función para generar gráfico de comunicaciones
+def generar_grafico_comunicaciones(df):
+    """Genera el gráfico de tipos de comunicaciones"""
+    df_plot = df["tipo_comunicacion"].value_counts().reset_index()
+    df_plot.columns = ["Tipo de comunicación", "Cantidad"]
+    
+    fig = px.bar(
+        df_plot, 
+        x="Tipo de comunicación", 
+        y="Cantidad", 
+        color="Tipo de comunicación", 
+        title="📬 Distribución por tipo de comunicación",
+        color_discrete_sequence=[CHIEFS_YELLOW, "#28A745", CHIEFS_RED]
+    )
+    
+    fig.update_layout(
+        xaxis_title="Tipo de comunicación",
+        yaxis_title="Número de comentarios"
+    )
+    
+    return fig
+
+# Función para generar PDF completo con todos los gráficos
+def generar_pdf_completo(df, metricas):
+    """
+    Genera un PDF ejecutivo completo con todos los gráficos
+    y análisis que se muestran en el dashboard
+    """
     buffer = BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-    width, height = A4
+    # Usar el tamaño Letter para más espacio
+    page_size = letter
+    c = canvas.Canvas(buffer, pagesize=page_size)
+    width, height = page_size
     
-    # Colores corporativos KelceTS
-    color_rojo = colors.Color(0xCE/255, 0x11/255, 0x26/255)
+    # Colores corporativos KelceTS y Chiefs
+    color_rojo = colors.Color(int(CHIEFS_RED[1:3], 16)/255, int(CHIEFS_RED[3:5], 16)/255, int(CHIEFS_RED[5:7], 16)/255)
+    color_amarillo = colors.Color(int(CHIEFS_YELLOW[1:3], 16)/255, int(CHIEFS_YELLOW[3:5], 16)/255, int(CHIEFS_YELLOW[5:7], 16)/255)
     color_negro = colors.black
+    color_gris = colors.Color(0x6c/255, 0x75/255, 0x7d/255)
     
-    # -------- CABECERA PERSONALIZADA --------
+    # -------- PÁGINA 1: CABECERA Y MÉTRICAS --------
     # Fondo rojo en la cabecera
     c.setFillColor(color_rojo)
-    c.rect(0, height-4*cm, width, 4*cm, fill=True)
+    c.rect(0, height-3*cm, width, 3*cm, fill=True)
     
     # Logo KelceTS
     try:
         logo_url = "https://github.com/AraceliFradejas/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas/raw/main/data/KelceTS_logo.png"
         local_logo_path = "/tmp/KelceTS_logo.png"
         urllib.request.urlretrieve(logo_url, local_logo_path)
-        c.drawImage(local_logo_path, x=2*cm, y=height-3.5*cm, width=2.5*cm, height=2.5*cm, mask='auto')
+        c.drawImage(local_logo_path, x=1*cm, y=height-2.8*cm, width=2*cm, height=2*cm, mask='auto')
     except Exception as e:
         # Si falla la carga del logo, dejamos un espacio
-        st.error(f"Error al cargar logo: {e}")
+        pass
     
     # Título en la cabecera
     c.setFont("Helvetica-Bold", 18)
     c.setFillColor(colors.white)
-    c.drawString(5*cm, height-2*cm, "INFORME EJECUTIVO KELCETS")
+    c.drawString(4*cm, height-1.8*cm, "INFORME EJECUTIVO KELCETS")
+    c.setFont("Helvetica", 12)
+    c.drawString(4*cm, height-2.4*cm, "Análisis automatizado de comentarios de clientes")
     
-    # -------- CONTENIDO --------
     # Fecha actual
-    import datetime
     c.setFont("Helvetica-Bold", 10)
     c.setFillColor(color_negro)
-    c.drawRightString(width-1*cm, height-5*cm, f"Fecha: {datetime.datetime.now().strftime('%d/%m/%Y')}")
+    c.drawRightString(width-1*cm, height-4*cm, f"Fecha: {datetime.now().strftime('%d/%m/%Y')}")
     
-    # Métricas clave
-    y_pos = height - 6*cm
+    # Título de la sección de métricas
+    y_pos = height - 5*cm
     c.setFont("Helvetica-Bold", 14)
-    c.drawString(2*cm, y_pos, "Métricas clave")
-    y_pos -= 1*cm
+    c.drawString(1*cm, y_pos, "Métricas clave")
+    c.setFillColor(color_rojo)
+    c.rect(1*cm, y_pos-0.3*cm, 3*cm, 0.1*cm, fill=True)
+    y_pos -= 1.5*cm
     
-    # Contenido de métricas
+    # Tabla de métricas clave
+    data = [
+        ["Indicador", "Valor"],
+        ["Total comentarios analizados:", f"{metricas['total_comentarios']}"],
+        ["Valoraciones positivas:", f"{metricas['porc_positivos']:.2f}%"],
+        ["Valoraciones negativas:", f"{metricas['porc_negativos']:.2f}%"],
+        ["Coste total estimado:", f"{metricas['coste_total']}"]
+    ]
+    
+    c.setFont("Helvetica", 10)
+    table_style = [
+        ('GRID', (0, 0), (-1, -1), 0.5, color_gris),
+        ('BACKGROUND', (0, 0), (1, 0), color_rojo),
+        ('TEXTCOLOR', (0, 0), (1, 0), colors.white),
+        ('FONT', (0, 0), (1, 0), 'Helvetica-Bold', 10),
+        ('FONT', (0, 1), (0, -1), 'Helvetica-Bold', 10),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 4),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]
+    
+    # Dibujar tabla de métricas
+    table_width = 12*cm
+    table_height = 3*cm
+    from reportlab.platypus import Table as PT
+    from reportlab.platypus import TableStyle
+    
+    table = PT(data, colWidths=[6*cm, 6*cm])
+    table.setStyle(TableStyle(table_style))
+    
+    # Dibujar tabla en el canvas
+    w, h = table.wrap(width, height)
+    table.drawOn(c, 1*cm, y_pos-h)
+    
+    y_pos -= 4*cm
+    
+    # Gráfico de valoraciones
+    c.setFont("Helvetica-Bold", 14)
+    c.setFillColor(color_negro)
+    c.drawString(1*cm, y_pos, "Distribución de valoraciones")
+    c.setFillColor(color_rojo)
+    c.rect(1*cm, y_pos-0.3*cm, 5*cm, 0.1*cm, fill=True)
+    
+    # Generar y guardar gráfico de valoraciones
+    fig_valoraciones = generar_grafico_valoraciones(df)
+    gráfico_val_path = "/tmp/grafico_valoraciones.png"
+    fig_valoraciones.write_image(gráfico_val_path, width=600, height=350)
+    
+    # Añadir imagen del gráfico
+    c.drawImage(gráfico_val_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
+    
+    # Footer en primera página
+    c.setFont("Helvetica-Italic", 8)
+    c.setFillColor(color_gris)
+    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 1/3")
+    c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
+    
+    # -------- PÁGINA 2: GRÁFICOS DE IDIOMAS Y COMUNICACIONES --------
+    c.showPage()
+    
+    # Repetir cabecera
+    c.setFillColor(color_rojo)
+    c.rect(0, height-3*cm, width, 3*cm, fill=True)
+    
+    try:
+        c.drawImage(local_logo_path, x=1*cm, y=height-2.8*cm, width=2*cm, height=2*cm, mask='auto')
+    except:
+        pass
+    
+    c.setFont("Helvetica-Bold", 18)
+    c.setFillColor(colors.white)
+    c.drawString(4*cm, height-1.8*cm, "INFORME EJECUTIVO KELCETS")
     c.setFont("Helvetica", 12)
-    c.drawString(2*cm, y_pos, f"Comentarios analizados: {metricas['total_comentarios']}")
-    y_pos -= 0.8*cm
-    c.drawString(2*cm, y_pos, f"Porcentaje negativos: {metricas['porc_negativos']:.2f}%")
-    y_pos -= 0.8*cm
-    c.drawString(2*cm, y_pos, f"Coste total estimado: {metricas['coste_total']}")
+    c.drawString(4*cm, height-2.4*cm, "Análisis automatizado de comentarios de clientes")
     
-    # Footer institucional
-    c.setFont("Helvetica-Oblique", 8)
-    c.drawCentredString(A4[0] / 2, 1.5*cm, "KelceTS S.L. – Proyecto académico ficticio | Curso Desarrollador10X – Instituto de Inteligencia Artificial")
+    # Título Idiomas
+    y_pos = height - 5*cm
+    c.setFont("Helvetica-Bold", 14)
+    c.setFillColor(color_negro)
+    c.drawString(1*cm, y_pos, "Distribución por idioma")
+    c.setFillColor(color_rojo)
+    c.rect(1*cm, y_pos-0.3*cm, 4*cm, 0.1*cm, fill=True)
+    
+    # Generar y guardar gráfico de idiomas
+    fig_idiomas = generar_grafico_idiomas(df)
+    if fig_idiomas:
+        gráfico_idiomas_path = "/tmp/grafico_idiomas.png"
+        fig_idiomas.write_image(gráfico_idiomas_path, width=600, height=350)
+        # Añadir imagen del gráfico
+        c.drawImage(gráfico_idiomas_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
+    
+    # Título Comunicaciones
+    y_pos = y_pos - 9*cm
+    c.setFont("Helvetica-Bold", 14)
+    c.setFillColor(color_negro)
+    c.drawString(1*cm, y_pos, "Distribución por tipo de comunicación")
+    c.setFillColor(color_rojo)
+    c.rect(1*cm, y_pos-0.3*cm, 6*cm, 0.1*cm, fill=True)
+    
+    # Generar y guardar gráfico de comunicaciones
+    fig_comunicaciones = generar_grafico_comunicaciones(df)
+    gráfico_com_path = "/tmp/grafico_comunicaciones.png"
+    fig_comunicaciones.write_image(gráfico_com_path, width=600, height=350)
+    
+    # Añadir imagen del gráfico
+    c.drawImage(gráfico_com_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
+    
+    # Footer en segunda página
+    c.setFont("Helvetica-Italic", 8)
+    c.setFillColor(color_gris)
+    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 2/3")
+    c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
+    
+    # -------- PÁGINA 3: ANÁLISIS DE VARIABLES DE CALIDAD --------
+    c.showPage()
+    
+    # Repetir cabecera
+    c.setFillColor(color_rojo)
+    c.rect(0, height-3*cm, width, 3*cm, fill=True)
+    
+    try:
+        c.drawImage(local_logo_path, x=1*cm, y=height-2.8*cm, width=2*cm, height=2*cm, mask='auto')
+    except:
+        pass
+    
+    c.setFont("Helvetica-Bold", 18)
+    c.setFillColor(colors.white)
+    c.drawString(4*cm, height-1.8*cm, "INFORME EJECUTIVO KELCETS")
+    c.setFont("Helvetica", 12)
+    c.drawString(4*cm, height-2.4*cm, "Análisis automatizado de comentarios de clientes")
+    
+    # Título Variables de Calidad
+    y_pos = height - 5*cm
+    c.setFont("Helvetica-Bold", 14)
+    c.setFillColor(color_negro)
+    c.drawString(1*cm, y_pos, "Análisis de variables clave de calidad")
+    c.setFillColor(color_rojo)
+    c.rect(1*cm, y_pos-0.3*cm, 6*cm, 0.1*cm, fill=True)
+    
+    # Generar y guardar gráfico de variables de calidad
+    fig_calidad = generar_grafico_calidad(df)
+    gráfico_cal_path = "/tmp/grafico_calidad.png"
+    fig_calidad.write_image(gráfico_cal_path, width=600, height=400)
+    
+    # Añadir imagen del gráfico
+    c.drawImage(gráfico_cal_path, x=1*cm, y=y_pos-9*cm, width=width-2*cm, height=8*cm)
+    
+    # Conclusiones y recomendaciones
+    y_pos = y_pos - 10*cm
+    c.setFont("Helvetica-Bold", 14)
+    c.setFillColor(color_negro)
+    c.drawString(1*cm, y_pos, "Conclusiones y recomendaciones")
+    c.setFillColor(color_rojo)
+    c.rect(1*cm, y_pos-0.3*cm, 5.5*cm, 0.1*cm, fill=True)
+    
+    # Texto con conclusiones
+    y_pos -= 1*cm
+    c.setFont("Helvetica", 10)
+    
+    # Determinar recomendaciones basadas en los datos
+    total = metricas['total_comentarios']
+    perc_neg = metricas['porc_negativos']
+    
+    conclusiones = []
+    if perc_neg > 30:
+        conclusiones.append("• Se detecta un alto porcentaje de valoraciones negativas. Se recomienda revisar urgentemente los procesos de control de calidad.")
+    else:
+        conclusiones.append("• El porcentaje de valoraciones negativas está en un rango aceptable, pero debe monitorizarse para detectar incrementos.")
+    
+    # Variables más problemáticas
+    problemas = []
+    for var in ["envio_96h", "embalaje_danado", "talla_correcta", "materiales_calidad"]:
+        if var in df.columns:
+            perc_no = len(df[df[var] == "no"]) / total * 100 if total > 0 else 0
+            if perc_no > 20:
+                var_nombre = var.replace("_", " ").title()
+                problemas.append((var_nombre, perc_no))
+    
+    problemas.sort(key=lambda x: x[1], reverse=True)
+    for i, (prob, perc) in enumerate(problemas[:3]):
+        conclusiones.append(f"• {prob}: {perc:.2f}% de comentarios negativos. Requiere revisión prioritaria.")
+    
+    if not problemas:
+        conclusiones.append("• No se detectan problemas significativos en ninguna de las variables analizadas.")
+    
+    # Añadir conclusiones al PDF
+    for i, texto in enumerate(conclusiones):
+        c.drawString(1*cm, y_pos - i*0.6*cm, texto)
+    
+    # Información de fecha y autor
+    y_pos -= (len(conclusiones) + 2) * 0.6*cm
+    c.setFont("Helvetica-Italic", 9)
+    c.drawString(1*cm, y_pos, f"Informe generado el {datetime.now().strftime('%d/%m/%Y')} - Análisis automatizado por KelceTS S.L.")
+    
+    # Footer en tercera página
+    c.setFont("Helvetica-Italic", 8)
+    c.setFillColor(color_gris)
+    c.drawCentredString(width/2, 1*cm, "KelceTS S.L. – Informe generado automáticamente | Página 3/3")
+    c.drawCentredString(width/2, 0.7*cm, "Curso Desarrollador10X – Instituto de Inteligencia Artificial")
     
     c.save()
     buffer.seek(0)
@@ -207,7 +584,7 @@ try:
 
     # 🎯 ENCABEZADO CEO CON LOGO Y LEMA
     st.markdown("""
-        <div style='background-color:#CE1126; padding:10px 20px; display:flex; flex-direction:column; align-items:center;'>
+        <div style='background-color:#E31837; padding:10px 20px; display:flex; flex-direction:column; align-items:center;'>
             <img src='https://github.com/AraceliFradejas/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas/raw/main/data/KelceTS_logo.png' style='max-height:80px; width:auto; margin-bottom:10px;'>
             <h2 style='color:white; text-align:center;'>Dashboard Dirección KelceTS</h2>
             <h4 style='color:white;'>Decisiones estratégicas basadas en comentarios reales de clientes 👟</h4>
@@ -215,7 +592,6 @@ try:
     """, unsafe_allow_html=True)
 
     # 📊 Indicadores clave
-    st.title("📊 Dashboard Dirección KelceTS")
     col1, col2, col3 = st.columns(3)
     
     # Cálculo de métricas
@@ -229,67 +605,52 @@ try:
     col2.metric("% Negativos", f"{porc_negativos:.2f}%")
     col3.metric("Coste estimado", f"{coste_total} €")
 
-    # Selector
+    # Selector con estilo Chiefs personalizado
+    st.sidebar.markdown(f"<h3 style='color: {CHIEFS_RED}; font-weight: bold; margin-top: 15px;'>Tipo de visualización:</h3>", unsafe_allow_html=True)
+    
     opciones = {
         "📈 Valoraciones": "📈 Distribución por valoración",
         "🌍 Idiomas": "🌍 Distribución por idioma con valoración dominante",
         "📬 Tipo de comunicaciones": "📬 Distribución por tipo de comunicación",
         "🔍 Variables de calidad": "🔍 Análisis de variables clave de calidad"
     }
-    eleccion = st.sidebar.radio("Tipo de visualización:", list(opciones.keys()))
+    
+    # Radio button con el estilo aplicado a través del CSS definido al inicio
+    eleccion = st.sidebar.radio("", list(opciones.keys()))
+    
+    # Espacio entre secciones
+    st.markdown("<hr style='margin-top: 15px; margin-bottom: 15px;'>", unsafe_allow_html=True)
+    
+    # Título de la visualización seleccionada
     st.markdown(f"## {opciones[eleccion]}")
 
     # Colores Chiefs
-    colores_valoraciones = {"negativa": "#E31837", "parcial": "#FFB612", "positiva": "#28A745", "neutra": "#7f7f7f"}
+    colores_valoraciones = {"negativa": CHIEFS_RED, "parcial": CHIEFS_YELLOW, "positiva": "#28A745", "neutra": "#7f7f7f"}
 
     if eleccion == "📈 Valoraciones":
-        df_plot = df["valoracion"].value_counts().reset_index()
-        df_plot.columns = ["Valoración", "Cantidad"]
-        fig = px.bar(df_plot, x="Valoración", y="Cantidad", color="Valoración", color_discrete_map=colores_valoraciones)
+        fig = generar_grafico_valoraciones(df)
         st.plotly_chart(fig, use_container_width=True)
 
     elif eleccion == "🌍 Idiomas":
-        # Manejo seguro de errores en agrupación
-        try:
-            df_agrupado = df.groupby("idioma")["valoracion"].value_counts().unstack().fillna(0)
-            for col in ["positiva", "negativa"]:
-                if col not in df_agrupado.columns:
-                    df_agrupado[col] = 0
-            df_agrupado["total"] = df_agrupado.sum(axis=1)
-            df_agrupado["predominante"] = df_agrupado[["positiva", "negativa"]].idxmax(axis=1)
-            df_agrupado = df_agrupado.reset_index()
-            
-            # Banderas para idiomas
-            flags = {
-                "español": "🇪🇸", "alemán": "🇩🇪", "francés": "🇫🇷", "italiano": "🇮🇹", 
-                "portugués": "🇵🇹", "neerlandés": "🇳🇱", "polaco": "🇵🇱", "finlandés": "🇫🇮",
-                "sueco": "🇸🇪", "danés": "🇩🇰", "griego": "🇬🇷", "húngaro": "🇭🇺",
-                "checo": "🇨🇿", "rumano": "🇷🇴"
-            }
-            
-            df_agrupado["label"] = df_agrupado["idioma"].apply(lambda x: f"{flags.get(x, '')} {x}")
-            fig = px.bar(df_agrupado, x="label", y="total", text="total", color="predominante", color_discrete_map=colores_valoraciones)
-            fig.update_traces(textposition="outside")
+        fig = generar_grafico_idiomas(df)
+        if fig:
             st.plotly_chart(fig, use_container_width=True)
-        except Exception as e:
-            st.error(f"Error en gráfico de idiomas: {e}")
-            st.write(df[["idioma", "valoracion"]].head())
+        else:
+            st.warning("No se pudo generar el gráfico de idiomas")
 
     elif eleccion == "📬 Tipo de comunicaciones":
-        df_plot = df["tipo_comunicacion"].value_counts().reset_index()
-        df_plot.columns = ["Tipo de comunicación", "Cantidad"]
-        fig = px.bar(df_plot, x="Tipo de comunicación", y="Cantidad", color="Tipo de comunicación", color_discrete_sequence=["#FFB612", "#28A745", "#E31837"])
+        fig = generar_grafico_comunicaciones(df)
         st.plotly_chart(fig, use_container_width=True)
         
     elif eleccion == "🔍 Variables de calidad":
         # Generamos el nuevo gráfico de variables de calidad
-        fig_calidad = generar_grafico_calidad(df)
-        st.plotly_chart(fig_calidad, use_container_width=True)
+        fig = generar_grafico_calidad(df)
+        st.plotly_chart(fig, use_container_width=True)
 
     # ✅ Carga de datos
     st.markdown("<p style='text-align:center; color:green; font-weight:bold;'>✅ Datos reales cargados desde GitHub</p>", unsafe_allow_html=True)
 
-    # 📥 Descargar PDF
+    # 📥 Descargar PDF con todos los gráficos
     metricas = {
         "total_comentarios": total_comentarios,
         "porc_positivos": porc_positivos,
@@ -297,27 +658,56 @@ try:
         "coste_total": coste_total
     }
     
-    # Generar PDF mejorado
-    pdf_buffer = generar_pdf_mejorado(df, metricas)
+    # Generar PDF completo con todos los gráficos
+    pdf_buffer = generar_pdf_completo(df, metricas)
     
-    # Botón de descarga (explícitamente mostrado)
+    # Botón de descarga con estilo Chiefs
     descargar = st.download_button(
         label="📄 Descargar informe ejecutivo en PDF",
         data=pdf_buffer,
         file_name="Informe_Ejecutivo_KelceTS.pdf",
         mime="application/pdf",
-        use_container_width=True,
-        type="primary"
+        use_container_width=True
     )
     
-    if not descargar:
-        st.info("👆 Haz clic en el botón para descargar el informe ejecutivo en PDF")
+    # ============================
+    # ℹ️ INFORMACIÓN TÉCNICA Y FOOTER
+    # ============================
+    with st.expander("🔧 Información Técnica del Sistema"):
+        st.markdown("""
+        - 🔐 Claves API cargadas desde `.env`
+        - 📂 Datos cargados desde GitHub `/data`
+        - 🧠 Modelos conectados: OpenAI y Gemini
+        - 🧪 Reglas internas cargadas
+        - 📊 Visualizaciones generadas con Plotly
+        - 📱 Dashboard responsivo para múltiples dispositivos
+        - 🖨️ Informes PDF generados con ReportLab
+        """)
+    
+    # ====================
+    # 👣 FOOTER
+    # ====================
+    st.markdown(
+        "<hr style='margin-top:50px;'>"
+        "<p style='text-align:center; font-size:small;'>Desarrollado por Araceli Fradejas Muñoz · "
+        "<a href='https://iia.es/' target='_blank'>Instituto de Inteligencia Artificial</a> · 2025</p>",
+        unsafe_allow_html=True
+    )
 
 except Exception as e:
     st.error(f"⚠️ Error en la aplicación: {e}")
-    st.info("Para resolver este problema, verifica:")
+    
+    # Mostrar información de depuración para ayudar a solucionar el problema
+    st.info("Revise los siguientes posibles problemas:")
     st.markdown("""
-    1. Que existe el archivo en GitHub
-    2. Que tienes conexión a Internet
-    3. Si el problema persiste, descarga el archivo manualmente
+    1. Verificar que el archivo Excel exista en GitHub
+    2. Comprobar que se tienen los permisos necesarios
+    3. Verificar que las columnas esperadas existen en el archivo
     """)
+    
+    # Footer siempre visible
+    st.markdown(
+        "<hr style='margin-top:50px;'>"
+        "<p style='text-align:center; font-size:small;'>Desarrollado por Araceli Fradejas Muñoz · "
+        "<a href='https://iia.es/' target='_blank'>Curso Desarrollador10x Instituto de Inteligencia Artificial</a> · Abril 2025</p>",
+        unsafe_allow_html=True
