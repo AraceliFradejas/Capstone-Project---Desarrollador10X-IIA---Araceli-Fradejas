@@ -7,6 +7,7 @@ import pandas as pd
 from langdetect import detect
 from dotenv import load_dotenv
 import plotly.express as px
+import urllib.request
 
 # 🔐 Carga de claves API
 load_dotenv()
@@ -23,17 +24,12 @@ def cargar_datos():
 comentarios = cargar_datos()
 
 # 🧠 Análisis de comentarios
-comentarios_procesados = []
-for c in comentarios:
-    try:
-        idioma = detect(c)
-    except:
-        idioma = "desconocido"
-    valor = "negativa" if any(p in c.lower() for p in ["roto", "desgaste", "plasticosa", "hundido"]) else "positiva"
-    comunicacion = "📦 Notificación interna (logística/calidad)" if valor == "negativa" else "✅ Respuesta al cliente"
-    comentarios_procesados.append({"comentario": c, "idioma": idioma, "valoracion_global": valor, "comunicacion_recomendada": comunicacion})
-
-df = pd.DataFrame(comentarios_procesados)
+df = pd.DataFrame([{
+    "comentario": c,
+    "idioma": detect(c) if c.strip() else "desconocido",
+    "valoracion_global": "negativa" if any(p in c.lower() for p in ["roto", "desgaste", "plasticosa", "hundido"]) else "positiva",
+    "comunicacion_recomendada": "📦 Notificación interna (logística/calidad)" if any(p in c.lower() for p in ["roto", "desgaste", "plasticosa", "hundido"]) else "✅ Respuesta al cliente"
+} for c in comentarios])
 
 # 🎨 Colores definidos
 colores_valoraciones = {"negativa": "#E31837", "parcial": "#FFB612", "positiva": "#28A745"}
@@ -49,7 +45,74 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 🧮 KPIs
+# ================================================
+# 💰 VALIDACIÓN CON EXCEL Y REGLAS DE CALIDAD
+# ================================================
+excel_url = "https://raw.githubusercontent.com/AraceliFradejas/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas/main/data/Informe_Final_KelceTS.xlsx"
+excel_path = "data/Informe_Final_KelceTS.xlsx"
+
+if not os.path.exists(excel_path):
+    urllib.request.urlretrieve(excel_url, excel_path)
+    st.success("📥 Excel descargado desde GitHub correctamente.")
+
+try:
+    df_excel = pd.read_excel(excel_path)
+
+    if "tipo_comunicacion" not in df_excel.columns:
+        df_excel["tipo_comunicacion"] = df_excel["valoracion"].apply(lambda v: (
+            "📦 Notificación interna (logística/calidad)" if v == "negativa" else
+            "✅ Respuesta al cliente" if v == "positiva" else
+            "📧 Comunicación pendiente de revisión"
+        ))
+
+    # Costes base por tipo de comunicación
+    coste_unitario = {
+        "📦 Notificación interna (logística/calidad)": 5,
+        "✅ Respuesta al cliente": 3,
+        "📧 Comunicación pendiente de revisión": 4
+    }
+    df_excel["coste_base"] = df_excel["tipo_comunicacion"].map(coste_unitario)
+
+    # Penalizaciones adicionales por medidas de calidad
+    penalizaciones = []
+    medidas = []
+
+    for _, row in df_excel.iterrows():
+        penal = 0
+        medida = []
+
+        if str(row.get("materiales_calidad", "")).strip().lower() == "no":
+            penal += 40
+            medida.append("25% descuento + recogida gratuita")
+
+        if str(row.get("envio_96h", "")).strip().lower() == "no":
+            penal += 50
+            medida.append("5% descuento por retraso de envío")
+
+        if str(row.get("talla_correcta", "")).strip().lower() == "no":
+            penal += 10
+            medida.append("Cambio de talla sin coste en 72h")
+
+        if str(row.get("embalaje_danado", "")).strip().lower() == "sí":
+            penal += 5
+            medida.append("5% descuento por embalaje dañado")
+
+        penalizaciones.append(penal)
+        medidas.append(" + ".join(medida) if medida else "Sin medida compensatoria")
+
+    df_excel["coste_penalizacion"] = penalizaciones
+    df_excel["medida_aplicada"] = medidas
+    df_excel["coste_total"] = df_excel["coste_base"] + df_excel["coste_penalizacion"]
+
+    st.markdown("### 🔍 Validación de métricas con Excel generado por IA")
+    st.write(f"🔢 Comentarios analizados (Excel): {len(df_excel)}")
+    st.write(f"📉 % Negativos (Excel): {len(df_excel[df_excel['valoracion']=='negativa']) / len(df_excel) * 100:.2f}%")
+    st.write(f"💰 Coste operativo estimado total (según reglas de calidad): {df_excel['coste_total'].sum():.2f} €")
+
+except Exception as e:
+    st.warning(f"⚠️ No se pudo cargar el Excel de comparación: {e}")
+
+# 🎯 KPIs desde comentarios
 st.title("📊 Dashboard Dirección KelceTS")
 col1, col2, col3 = st.columns(3)
 col1.metric("Comentarios analizados", len(df))
@@ -57,12 +120,13 @@ negativos = df[df["valoracion_global"] == "negativa"]
 col2.metric("% Negativos", f"{len(negativos)/len(df)*100:.2f}%")
 coste_estimado = (
     df["comunicacion_recomendada"].str.contains("cliente").sum()*3 +
-    df["comunicacion_recomendada"].str.contains("interna").sum()*5 +
-    df["comunicacion_recomendada"].str.contains("proveedor").sum()*7
+    df["comunicacion_recomendada"].str.contains("interna").sum()*5
 )
-col3.metric("Ahorro estimado", f"{coste_estimado:.2f} €")
+col3.metric("Coste estimado", f"{coste_estimado:.2f} €")
 
-# 📈 Visualización
+# ============================
+# 📈 Visualización de datos
+# ============================
 st.markdown("## 📈 Análisis visual")
 opciones = ["📈 Valoraciones", "🌍 Idiomas", "📬 Tipo de comunicaciones"]
 eleccion = st.sidebar.radio("Tipo de visualización:", opciones)
@@ -71,15 +135,10 @@ if eleccion == "📈 Valoraciones":
     df_plot = df["valoracion_global"].value_counts().reset_index()
     df_plot.columns = ["Valoración", "Cantidad"]
     df_plot["Color"] = df_plot["Valoración"].map(colores_valoraciones).fillna("#999999")
-    fig = px.bar(
-        df_plot,
-        x="Valoración",
-        y="Cantidad",
-        color="Valoración",
-        color_discrete_map=colores_valoraciones
-    )
+    fig = px.bar(df_plot, x="Valoración", y="Cantidad", color="Valoración", color_discrete_map=colores_valoraciones)
     fig.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig, use_container_width=True)
+
 elif eleccion == "🌍 Idiomas":
     df_agrupado = df.groupby("idioma")["valoracion_global"].value_counts().unstack().fillna(0)
     df_agrupado["total"] = df_agrupado.sum(axis=1)
@@ -102,14 +161,7 @@ elif eleccion == "🌍 Idiomas":
         text="total",
         color="predominante",
         color_discrete_map=colores_valoraciones,
-        title="Distribución por idioma con valoración dominante",
-        hover_data={
-            "positiva": True,
-            "negativa": True,
-            "total": False,
-            "label": False,
-            "predominante": False
-        }
+        title="Distribución por idioma con valoración dominante"
     )
     fig.update_traces(textposition="outside")
     st.plotly_chart(fig)
@@ -117,7 +169,9 @@ elif eleccion == "🌍 Idiomas":
 elif eleccion == "📬 Tipo de comunicaciones":
     df_plot = df["comunicacion_recomendada"].value_counts().reset_index()
     df_plot.columns = ["Tipo de comunicación", "Cantidad"]
-    fig = px.bar(df_plot, x="Tipo de comunicación", y="Cantidad", color="Tipo de comunicación", color_discrete_sequence=["#FFB612", "#28A745", "#E31837"])
+    fig = px.bar(df_plot, x="Tipo de comunicación", y="Cantidad",
+                 color="Tipo de comunicación",
+                 color_discrete_sequence=["#FFB612", "#28A745", "#E31837"])
     st.plotly_chart(fig)
 
 # ✅ Mensaje final
