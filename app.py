@@ -58,7 +58,34 @@ st.markdown(f"""
         padding: 10px;
     }}
     
+    /* Estilo para el texto de los radio buttons */
     .stRadio label span p {{
+        color: {CHIEFS_RED} !important;
+        font-weight: bold !important;
+    }}
+    
+    /* Cambiar el color del círculo de selección a rojo Chiefs */
+    .stRadio input:checked + div svg {{
+        fill: {CHIEFS_RED} !important;
+        color: {CHIEFS_RED} !important;
+    }}
+    
+    .stRadio input:checked + div {{
+        border-color: {CHIEFS_RED} !important;
+        background-color: white !important;
+    }}
+    
+    /* Fondo rojo para la opción seleccionada */
+    .stRadio input:checked + div + label {{
+        background-color: {CHIEFS_RED}20 !important;  /* 20 es para la opacidad */
+        padding: 5px 10px !important;
+        border-radius: 4px !important;
+        display: inline-block !important;
+        width: 100% !important;
+    }}
+    
+    /* Estilo cuando el radio button está seleccionado */
+    .stRadio input:checked + div + label span p {{
         color: {CHIEFS_RED} !important;
         font-weight: bold !important;
     }}
@@ -155,14 +182,13 @@ def generar_grafico_calidad(df):
         "no mencionado": "#6c757d"  # Gris para valores no mencionados
     }
     
-    # Crear gráfico con Plotly
+    # Crear gráfico con Plotly - sin título para evitar duplicación
     fig = px.bar(
         df_calidad,
         x="Categoría",
         y="Cantidad", 
         color="Valor",
         barmode="group",
-        title="📊 Análisis de variables clave de calidad",
         color_discrete_map=colores_valores
     )
     
@@ -194,7 +220,6 @@ def generar_grafico_valoraciones(df):
         x="Valoración", 
         y="Cantidad", 
         color="Valoración", 
-        title="📈 Distribución por valoración",
         color_discrete_map=colores_valoraciones
     )
     
@@ -241,7 +266,6 @@ def generar_grafico_idiomas(df):
             y="total", 
             text="total", 
             color="predominante", 
-            title="🌍 Distribución por idioma con valoración dominante",
             color_discrete_map=colores_valoraciones
         )
         
@@ -267,7 +291,6 @@ def generar_grafico_comunicaciones(df):
         x="Tipo de comunicación", 
         y="Cantidad", 
         color="Tipo de comunicación", 
-        title="📬 Distribución por tipo de comunicación",
         color_discrete_sequence=[CHIEFS_YELLOW, "#28A745", CHIEFS_RED]
     )
     
@@ -690,7 +713,7 @@ try:
     st.markdown(
         "<hr style='margin-top:50px;'>"
         "<p style='text-align:center; font-size:small;'>Desarrollado por Araceli Fradejas Muñoz · "
-        "<a href='https://iia.es/' target='_blank'>Instituto de Inteligencia Artificial</a> · 2025</p>",
+        "<a href='https://iia.es/' target='_blank'>Curso Desarrollador10X Instituto de Inteligencia Artificial</a> · Abril 2025</p>",
         unsafe_allow_html=True
     )
 
@@ -709,5 +732,6 @@ except Exception as e:
     st.markdown(
         "<hr style='margin-top:50px;'>"
         "<p style='text-align:center; font-size:small;'>Desarrollado por Araceli Fradejas Muñoz · "
-        "<a href='https://iia.es/' target='_blank'>Curso Desarrollador10x Instituto de Inteligencia Artificial</a> · Abril 2025</p>",
+        "<a href='https://iia.es/' target='_blank'>Curso Desarrollador10X Instituto de Inteligencia Artificial</a> · Abril 2025</p>",
         unsafe_allow_html=True
+    )
