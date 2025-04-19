@@ -1,169 +1,128 @@
-# Dashboard Estratégico KelceTS S.L. 👟
+# 🚀 Proyecto Capstone – KelceTS S.L.
 
-![Logo KelceTS](https://github.com/AraceliFradejas/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas/raw/main/data/KelceTS_logo.png)
+*Análisis Automatizado de Comentarios de Clientes y Dashboard Estratégico*  
+**Curso:** Desarrollador 10X – Instituto de Inteligencia Artificial  
+**Autora:** Araceli Fradejas Muñoz  
+**Fecha:** Abril 2025  
 
-## 🌟 Descripción (Español)
+---
 
-Dashboard analítico desarrollado como proyecto final del curso Desarrollador10X del Instituto de Inteligencia Artificial. Esta aplicación está diseñada para la empresa ficticia KelceTS S.L., una startup especializada en la venta de zapatillas online en Europa.
+## 📑 Tabla de Contenidos
+- [Descripción General](#descripción-general)
+- [Entregables](#entregables)
+- [Instalación Rápida](#instalación-rápida)
+- [Cómo Ejecutar](#cómo-ejecutar)
+- [Capturas](#capturas)
+- [Roadmap](#roadmap)
+- [Créditos](#créditos)
+- [ENGLISH VERSION](#english-version)
 
-El dashboard ofrece a la Dirección y al CEO una **visión analítica y estratégica** sobre los comentarios de clientes en diferentes idiomas y canales, permitiendo tomar decisiones basadas en datos reales.
+---
 
-### 🎯 Objetivos de la aplicación
+## Descripción General
+KelceTS S.L. es una *startup* ficticia que vende zapatillas online en Europa.  
+Durante el proyecto se desarrolló una **suite de IA generativa** que automatiza el
+análisis de comentarios multilingües y presenta la información tanto a agentes operativos
+como a la dirección.
 
-- Visualizar el volumen y evolución de comentarios recibidos
-- Analizar temáticas predominantes (logística, calidad, etc.)
-- Detectar idiomas más frecuentes y su distribución geográfica
-- Medir el número y tipo de comunicaciones generadas (cliente, logística, proveedor)
-- Estimar costes de respuesta manual vs automática con IA
-- Facilitar decisiones estratégicas basadas en datos en tiempo real
+---
 
-### 📊 Funcionalidades principales
+## Entregables
+| Nº | Producto | Tecnologías | Descripción |
+|----|----------|-------------|-------------|
+| **1** | ⚙️ *Notebook* de Análisis y Exportación (`Capstone_Project.ipynb`) | Python · OpenAI · Gemini · Pandas · Plotly | Analiza comentarios, aplica reglas de negocio y genera `Informe_Final_KelceTS.xlsx` |
+| **2** | 💬 Asistente IA para Call‑Center (`Gradio_CallCenter_KelceTS.ipynb`) | Python · Gradio · LangDetect | Interface web para agentes que detecta idioma, traduce, analiza y genera comunicaciones |
+| **3** | 📊 Dashboard Dirección (`app.py`) | Python · Streamlit · Plotly · ReportLab | Visualiza KPIs clave, costes y genera informes PDF ejecutivos |
 
-- **Dashboard interactivo** con métricas en tiempo real
-- **Visualizaciones dinámicas** de datos por valoración, idioma y tipo de comunicación
-- **Análisis de variables clave** de calidad (envíos, embalaje, tallas, etc.)
-- **Generación automatizada** de informes PDF ejecutivos
-- **Procesamiento multilingüe** de comentarios de clientes
-- **Estimación de costes** asociados a cada tipo de comunicación
+---
 
-### 💻 Tecnologías utilizadas
+## Instalación Rápida
+```bash
+git clone https://github.com/AraceliFradejas/kelcets-dashboard.git
+cd kelcets-dashboard
+pip install -r requirements.txt
+# Configurar claves (opcional)
+echo "OPENAI_API_KEY=TU_CLAVE" >> .env
+echo "GOOGLE_API_KEY=TU_CLAVE" >> .env
+```
 
-- **Python** como lenguaje principal
-- **Streamlit** para el desarrollo del dashboard interactivo
-- **Pandas** para manipulación y análisis de datos
-- **Plotly** para visualizaciones gráficas dinámicas
-- **ReportLab** para generación de informes PDF profesionales
-- **GitHub** para versionado y almacenamiento de datos
-- Integración con **APIs de IA** (OpenAI y Google Gemini)
+---
 
-### 🚀 Instalación
+## Cómo Ejecutar
+| Entregable | Comando / Acción |
+|------------|------------------|
+| **E1** Notebook | Abrir en Colab ![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg) y seguir celdas |
+| **E2** Gradio | Abrir `Gradio_CallCenter_KelceTS.ipynb` en Colab y ejecutar |
+| **E3** Dashboard | `streamlit run app.py` |
 
-1. Clone este repositorio:
-   ```
-   git clone https://github.com/AraceliFradejas/kelcets-dashboard.git
-   cd kelcets-dashboard
-   ```
+---
 
-2. Instale las dependencias:
-   ```
-   pip install -r requirements.txt
-   ```
+## Capturas
+<p align="center">
+  <img src="data/gradio_preview.png" width="45%" />
+  <img src="data/dashboard_preview.png" width="45%" />
+</p>
 
-3. Configure las variables de entorno para las APIs de IA (opcional):
-   - Cree un archivo `.env` con las siguientes variables:
-     ```
-     OPENAI_API_KEY=su_clave_api_openai
-     GOOGLE_API_KEY=su_clave_api_google
-     ```
+---
 
-4. Ejecute la aplicación:
-   ```
-   streamlit run app.py
-   ```
+## Roadmap
+- [ ] Clasificación emocional y tono  
+- [ ] Soporte multimodal (imágenes, vídeos)  
+- [ ] API REST para integración con CRM  
+- [ ] Despliegue en Streamlit Cloud / Hugging Face  
 
-### 📁 Estructura del proyecto
+---
 
-- `app.py` - Aplicación principal de Streamlit
-- `requirements.txt` - Dependencias del proyecto
-- `data/` - Directorio con archivos de datos
-  - `BD Comentarios KelceTS.txt` - Base de datos de comentarios
-  - `Informe_Final_KelceTS.xlsx` - Dataset principal analizado
-  - `KelceTS_logo.png` - Logo corporativo
-  - `Reglas de calidad clientes KelceTS SL.xlsx` - Reglas de negocio
-
-### 🧠 Impacto esperado
-
-- Mayor conocimiento de incidencias recurrentes
-- Optimización del proceso de atención al cliente
-- Visión ejecutiva sobre el uso de IA en análisis multilingüe
-- Apoyo a decisiones estratégicas con métricas visuales y automáticas
-
-### 👩‍💻 Autora
-
-**Araceli Fradejas Muñoz**  
-Curso Desarrollador10X - Instituto de Inteligencia Artificial  
+## Créditos
+Creado por **Araceli Fradejas Muñoz**   
+Proyecto desarrollado por **Araceli Fradejas Muñoz** como parte del I Curso Intensivo de Desarrollador 10x con IA – Instituto de Inteligencia Artificial*.  
+Contacto: [LinkedIn](https://www.linkedin.com/in/araceli-fradejas-munoz-transformaciondigital/)
 Abril 2025
 
 ---
 
-## 🌟 Description (English)
+# ENGLISH VERSION
 
-This analytical dashboard was developed as the final project for the Desarrollador10X course at the Instituto de Inteligencia Artificial. The application is designed for the fictional company KelceTS S.L., a startup specialized in online shoe sales across Europe.
+## Overview
+KelceTS S.L. is a fictional online sneaker company.  
+This repository contains a **Generative AI solution** that automates multilingual
+feedback analysis and provides both operational and executive interfaces.
 
-The dashboard provides Management and the CEO with an **analytical and strategic view** of customer comments in different languages and channels, enabling data-driven decision making.
+## Deliverables
+| # | Product | Tech | Description |
+|---|---------|------|-------------|
+| **1** | ⚙️ Analysis Notebook (`Capstone_Project.ipynb`) | Python · OpenAI · Gemini · Pandas · Plotly | Processes comments, applies business rules and exports `Informe_Final_KelceTS.xlsx` |
+| **2** | 💬 AI Assistant for Call Center (`Gradio_CallCenter_KelceTS.ipynb`) | Python · Gradio · LangDetect | Web UI for agents: language detection, translation, analysis and message generation |
+| **3** | 📊 Executive Dashboard (`app.py`) | Python · Streamlit · Plotly · ReportLab | Displays key KPIs, cost estimates and generates executive PDF reports |
 
-### 🎯 Application Objectives
+## Quick Start
+```bash
+git clone https://github.com/AraceliFradejas/kelcets-dashboard.git
+cd kelcets-dashboard
+pip install -r requirements.txt
+# API keys (optional)
+echo "OPENAI_API_KEY=YOUR_KEY" >> .env
+echo "GOOGLE_API_KEY=YOUR_KEY" >> .env
+```
 
-- Visualize the volume and evolution of received comments
-- Analyze predominant topics (logistics, quality, etc.)
-- Detect most frequent languages and their geographic distribution
-- Measure the number and type of communications generated (customer, logistics, supplier)
-- Estimate costs of manual vs. automated AI responses
-- Facilitate strategic decisions based on real-time data
+## Run
+| Deliverable | Command |
+|-------------|---------|
+| **D1** Notebook | Open in Colab ![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg) |
+| **D2** Gradio | Open `Gradio_CallCenter_KelceTS.ipynb` in Colab |
+| **D3** Dashboard | `streamlit run app.py` |
 
-### 📊 Key Features
+## Screenshots
+See `/data` folder for previews.
 
-- **Interactive dashboard** with real-time metrics
-- **Dynamic data visualizations** by rating, language, and communication type
-- **Analysis of key quality variables** (shipping, packaging, sizes, etc.)
-- **Automated generation** of executive PDF reports
-- **Multilingual processing** of customer comments
-- **Cost estimation** associated with each type of communication
-
-### 💻 Technologies Used
-
-- **Python** as the main language
-- **Streamlit** for interactive dashboard development
-- **Pandas** for data manipulation and analysis
-- **Plotly** for dynamic graphical visualizations
-- **ReportLab** for professional PDF report generation
-- **GitHub** for versioning and data storage
-- Integration with **AI APIs** (OpenAI and Google Gemini)
-
-### 🚀 Installation
-
-1. Clone this repository:
-   ```
-   git clone https://github.com/AraceliFradejas/kelcets-dashboard.git
-   cd kelcets-dashboard
-   ```
-
-2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. Configure environment variables for AI APIs (optional):
-   - Create a `.env` file with the following variables:
-     ```
-     OPENAI_API_KEY=your_openai_api_key
-     GOOGLE_API_KEY=your_google_api_key
-     ```
-
-4. Run the application:
-   ```
-   streamlit run app.py
-   ```
-
-### 📁 Project Structure
-
-- `app.py` - Main Streamlit application
-- `requirements.txt` - Project dependencies
-- `data/` - Directory with data files
-  - `BD Comentarios KelceTS.txt` - Comments database
-  - `Informe_Final_KelceTS.xlsx` - Main dataset analyzed
-  - `KelceTS_logo.png` - Corporate logo
-  - `Reglas de calidad clientes KelceTS SL.xlsx` - Business rules
-
-### 🧠 Expected Impact
-
-- Greater knowledge of recurring incidents
-- Optimization of the customer service process
-- Executive overview of AI use in multilingual analysis
-- Support for strategic decisions with visual and automated metrics
+## Roadmap
+- Emotion & tone classification  
+- Multimodal support  
+- REST API for CRM integration  
+- Deployment to Streamlit Cloud / Hugging Face  
 
 ### 👩‍💻 Author
-
-**Araceli Fradejas Muñoz**  
+Created by **Araceli Fradejas Muñoz**   
 Desarrollador10X Course - Instituto de Inteligencia Artificial  
+Contact: [LinkedIn](https://www.linkedin.com/in/araceli-fradejas-munoz-transformaciondigital/)
 April 2025
