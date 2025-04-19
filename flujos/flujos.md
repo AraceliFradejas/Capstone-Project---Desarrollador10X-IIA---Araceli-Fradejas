@@ -6,6 +6,22 @@ Este documento describe los cuatro flujos operativos fundamentales del sistema d
 El directorio `flujos/` contiene los siguientes elementos visuales:
 
 ---
+## 🔹 0. Flujo General del Sistema Integrado (`Flujo_Completo0.png`)
+
+Este diagrama resume la integración de los tres módulos y su funcionamiento conjunto como un ecosistema de IA para la atención al cliente.
+
+**Componentes integrados:**
+- El análisis (Módulo 1) alimenta a la interfaz del Call Center (Módulo 2).
+- La interfaz genera comunicaciones y retroalimenta al dashboard (Módulo 3).
+- El dashboard ofrece insights estratégicos que permiten ajustar los análisis futuros.
+
+**Resumen del proceso:**
+1. Comentarios → análisis automatizado (M1).
+2. M1 → interfaz operativa para agentes (M2).
+3. M2 → datos a visualizar por dirección (M3).
+4. M3 → mejora continua del sistema (↩️ M1).
+
+---
 
 ## 🔹 1. Flujo de Análisis Automatizado de Comentarios (`Flujo_AnalisisComentarios_Entregable1.png`)
 
@@ -62,23 +78,6 @@ Este flujo representa el Módulo 3: un panel directivo desarrollado en Streamlit
 3. Visualización interactiva mediante Plotly.
 4. Generación de informes ejecutivos.
 5. Uso por parte de dirección para la toma de decisiones.
-
----
-
-## 🔹 4. Flujo General del Sistema Integrado (`Flujo_Completo0.png`)
-
-Este diagrama resume la integración de los tres módulos y su funcionamiento conjunto como un ecosistema de IA para la atención al cliente.
-
-**Componentes integrados:**
-- El análisis (Módulo 1) alimenta a la interfaz del Call Center (Módulo 2).
-- La interfaz genera comunicaciones y retroalimenta al dashboard (Módulo 3).
-- El dashboard ofrece insights estratégicos que permiten ajustar los análisis futuros.
-
-**Resumen del proceso:**
-1. Comentarios → análisis automatizado (M1).
-2. M1 → interfaz operativa para agentes (M2).
-3. M2 → datos a visualizar por dirección (M3).
-4. M3 → mejora continua del sistema (↩️ M1).
 
 ---
 
