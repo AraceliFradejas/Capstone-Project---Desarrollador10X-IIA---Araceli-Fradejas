@@ -1,6 +1,6 @@
 # 🚀 Capstone Project Curso Desarrolador 10x de Instituto de Inteligencia Artificial - Araceli Fradejas Muñoz - Abril 2025
 
-*Análisis Automatizado de Comentarios de Clientes y Dashboard Estratégico*  
+*Análisis Automatizado de Comentarios de Clientes, App para agentes de Call Cnter y Dashboard Estratégico para CEO y ejecutivos de la startup ficticia "KELCE TS S.L."*  
 **Curso:** Desarrollador 10X – Instituto de Inteligencia Artificial  
 **Autora:** Araceli Fradejas Muñoz  
 **Fecha:** Abril 2025  
