@@ -1,11 +1,10 @@
 """
-🧠 Capstone Project - Dashboard Estratégico de Comentarios (KelceTS S.L.)
-Instituto de Inteligencia Artificial - Curso Desarrollador 10x
+🚀 Capstone Project Curso Desarrolador 10x de Instituto de Inteligencia Artificial - Entregable 3
 
 👤 Estudiante: Araceli Fradejas Muñoz  
 📅 Fecha de entrega: 21/04/2025
 
-📄 Descripción del Proyecto:
+📝 Descripción del Proyecto: Informe ejecutivo generado IA para CEO y Directivos
 KelceTS S.L. es una startup ficticia especializada en la venta de zapatillas online en Europa.
 
 Este dashboard ha sido diseñado para ofrecer a la Dirección y al CEO una **visión analítica y estratégica** 
