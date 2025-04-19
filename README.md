@@ -1,4 +1,4 @@
-# 🚀 Proyecto Capstone – KelceTS S.L.
+# 🚀 Capstone Project Curso Desarrolador 10x de Instituto de Inteligencia Artificial - Araceli Fradejas Muñoz - Abril 2025
 
 *Análisis Automatizado de Comentarios de Clientes y Dashboard Estratégico*  
 **Curso:** Desarrollador 10X – Instituto de Inteligencia Artificial  
