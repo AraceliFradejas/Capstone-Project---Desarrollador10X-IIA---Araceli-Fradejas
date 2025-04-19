@@ -73,7 +73,7 @@ echo "GOOGLE_API_KEY=TU_CLAVE" >> .env
 
 ---
 
-## Créditos
+## 👩‍💻 Créditos
 Creado por **Araceli Fradejas Muñoz**   
 Proyecto desarrollado por **Araceli Fradejas Muñoz** como parte del I Curso Intensivo de Desarrollador 10x con IA – Instituto de Inteligencia Artificial*.  
 Contacto: [LinkedIn](https://www.linkedin.com/in/araceli-fradejas-munoz-transformaciondigital/)
