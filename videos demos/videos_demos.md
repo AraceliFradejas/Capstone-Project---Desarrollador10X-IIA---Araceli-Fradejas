@@ -3,6 +3,14 @@
 
 Este directorio contiene los videos de demostración de las diferentes etapas del proyecto KelceTS Dashboard. A continuación se presenta una descripción de cada video.
 
+## ⭐ Video de Presentación - Recomendado Ver Primero ⭐
+**Español**: Este video ofrece una visión general del proyecto completo y se recomienda verlo antes de los videos específicos de cada entregable para obtener una mejor comprensión del contexto global. **IMPORTANTE: Este video está disponible en español.**  
+**English**: This video provides an overview of the complete project and is recommended to watch before the specific videos of each deliverable to gain a better understanding of the global context. **IMPORTANT: This presentation video is available in Spanish only.**
+
+📹 [Ver video/Watch video: Video Presentación](./Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)
+🎬 [Ver en YouTube/Watch on YouTube](https://youtu.be/8oreCBeRBVs)
+> **¡Recomendación!** Comienza tu exploración del proyecto viendo este video introductorio.
+
 ## Entregable 1 - Análisis de Comentarios
 **Español**: Este video muestra la primera fase del proyecto enfocada en el análisis de los comentarios de clientes utilizando técnicas de procesamiento de lenguaje natural.  
 **English**: This video shows the first phase of the project focused on customer comment analysis using natural language processing techniques.

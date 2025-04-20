@@ -66,18 +66,40 @@ Para una descripción detallada de cada flujo, consultar el archivo [flujos.md](
 ## Videos Demostrativos
 El directorio `/videos demos/` contiene grabaciones del proyecto en funcionamiento:
 
+### ⭐ Video de Presentación - Recomendado Ver Primero ⭐
+**Español**: Este video ofrece una visión general del proyecto completo y se recomienda verlo antes de los videos específicos de cada entregable. **IMPORTANTE: Este video está disponible en español.**  
+📹 [Ver video local](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
+🎬 [Ver en YouTube](https://youtu.be/8oreCBeRBVs)
+> **¡Recomendación!** Comienza tu exploración del proyecto viendo este video introductorio.
+
 ### Entregable 1 - Análisis de Comentarios
-📹 [Ver demo del análisis automático](./videos%20demos/Entregable1_crompress.mp4)
+**Español**: Primera fase del proyecto enfocada en el análisis de comentarios de clientes utilizando técnicas de procesamiento de lenguaje natural.  
+📹 [Ver video local](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable1.mp4)  
+🎬 [Ver en YouTube](https://youtu.be/NqKmh-CEdBI)
 
 ### Entregable 2 - App Call Center con Gradio
-📹 [Ver demo general](./videos%20demos/Entregable2_crompress.mp4)  
-📹 [Ver demo detallada de Gradio](./videos%20demos/Entregable2gradio_crompress.mp4)
+**Español**: Demostración de la aplicación Gradio para el equipo de Call Center.  
+📹 [Ver demo general](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable%202.mp4)  
+🎬 [Ver en YouTube](https://youtu.be/ETj7vEMu_Co)
+
+#### Demo Detallada de Gradio
+**Español**: Una mirada más profunda a la funcionalidad de la aplicación Gradio para el Call Center.  
+📹 [Ver demo detallada](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable2-App%20GRADIO.mp4)  
+🎬 [Ver en YouTube](https://youtu.be/vDs4BwcLUAU)
 
 ### Entregable 3 - Dashboard Ejecutivo
-📹 [Ver demo general](./videos%20demos/Entregable3_crompress.mp4)  
-📹 [Ver en PC](./videos%20demos/Entregable3streamlitpc_crompress.mp4)  
-📹 [Ver en iPad Air 13](./videos%20demos/Entregable3streamlit_IpadAir13_compress.mp4)  
-📹 [Ver en iPhone 16 Pro Max](./videos%20demos/Entregable3streamlit_Iphone16promax_compress.mp4)
+**Español**: Dashboard desarrollado con Streamlit para el CEO y directivos.  
+📹 [Ver demo general](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3.mp4)  
+🎬 [Ver en YouTube](https://youtu.be/9QaC71r9A_s)
+
+#### Demo en Diferentes Dispositivos
+**iPad Air 13**: Visualización del dashboard en tablet.  
+📹 [Ver en iPad Air 13](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPad%20Air13%202025.mp4)  
+🎬 [Ver en YouTube](https://youtube.com/shorts/1XyYyEJMPoY?feature=share)
+
+**iPhone 16 Pro Max**: Versión móvil del dashboard.  
+📹 [Ver en iPhone 16 Pro Max](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPhone16%20ProMax.mp4)  
+🎬 [Ver en YouTube](https://youtube.com/shorts/083jXERVVWg?feature=share)
 
 Para más información sobre los videos, consultar [videos_demos.md](./videos%20demos/videos_demos.md).
 
@@ -165,18 +187,36 @@ For a detailed description of each flow, see the [flujos.md](./flujos/flujos.md)
 ## Demo Videos
 The `/videos demos/` directory contains recordings of the project in operation:
 
+### ⭐ Presentation Video - Recommended to Watch First ⭐
+**IMPORTANT**: This presentation video provides an overview of the complete project and is available **in Spanish only**.  
+📹 [Watch local video](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
+🎬 [Watch on YouTube](https://youtu.be/8oreCBeRBVs)
+> **Recommendation!** Start exploring the project by watching this introductory video.
+
 ### Deliverable 1 - Comment Analysis
-📹 [Watch automated analysis demo](./videos%20demos/Entregable1_crompress.mp4)
+📹 [Watch local video](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable1.mp4)  
+🎬 [Watch on YouTube](https://youtu.be/NqKmh-CEdBI)
 
 ### Deliverable 2 - Gradio Call Center App
-📹 [Watch general demo](./videos%20demos/Entregable2_crompress.mp4)  
-📹 [Watch detailed Gradio demo](./videos%20demos/Entregable2gradio_crompress.mp4)
+📹 [Watch general demo](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable%202.mp4)  
+🎬 [Watch on YouTube](https://youtu.be/ETj7vEMu_Co)
+
+#### Detailed Gradio Demo
+📹 [Watch detailed demo](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable2-App%20GRADIO.mp4)  
+🎬 [Watch on YouTube](https://youtu.be/vDs4BwcLUAU)
 
 ### Deliverable 3 - Executive Dashboard
-📹 [Watch general demo](./videos%20demos/Entregable3_crompress.mp4)  
-📹 [Watch on PC](./videos%20demos/Entregable3streamlitpc_crompress.mp4)  
-📹 [Watch on iPad Air 13](./videos%20demos/Entregable3streamlit_IpadAir13_compress.mp4)  
-📹 [Watch on iPhone 16 Pro Max](./videos%20demos/Entregable3streamlit_Iphone16promax_compress.mp4)
+📹 [Watch general demo](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3.mp4)  
+🎬 [Watch on YouTube](https://youtu.be/9QaC71r9A_s)
+
+#### Demos on Different Devices
+**iPad Air 13**: Dashboard visualization on tablet.  
+📹 [Watch on iPad Air 13](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPad%20Air13%202025.mp4)  
+🎬 [Watch on YouTube](https://youtube.com/shorts/1XyYyEJMPoY?feature=share)
+
+**iPhone 16 Pro Max**: Mobile version of the dashboard.  
+📹 [Watch on iPhone 16 Pro Max](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPhone16%20ProMax.mp4)  
+🎬 [Watch on YouTube](https://youtube.com/shorts/083jXERVVWg?feature=share)
 
 For more information about the videos, see [videos_demos.md](./videos%20demos/videos_demos.md).
 
