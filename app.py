@@ -64,75 +64,49 @@ CHIEFS_RED = "#E31837"
 CHIEFS_YELLOW = "#FFB612"
 CHIEFS_RED_DARK = "#B30E29"  # Versión más oscura para hover
 
-# Aplicar estilos personalizados al sidebar y a los componentes
-st.markdown(f"""
+# Comienzo limpio con un solo bloque CSS para el sidebar - solución definitiva
+st.markdown("""
 <style>
-    /* Estilo para el sidebar - fondo gris claro en lugar de negro */
-    .css-1d391kg, [data-testid="stSidebar"], .css-1cypcdb, .css-1nm2qww, .css-1mbkxta {{
-        background-color: #f5f5f5 !important;
-    }}
-    
-    /* Estilo para el texto en el sidebar - texto oscuro para contraste */
-    [data-testid="stSidebar"] p, 
-    [data-testid="stSidebar"] h1,
-    [data-testid="stSidebar"] h2, 
-    [data-testid="stSidebar"] h3, 
-    [data-testid="stSidebar"] h4 {{
-        color: #333333 !important;
-    }}
-    
-    /* Estilo específico para las etiquetas de los radio buttons */
-    .stRadio label {{
-        color: #333333 !important;
-        font-weight: bold !important;
-    }}
-    
-    /* Estilo para el texto dentro de los radio buttons */
-    .stRadio label span {{
-        color: #333333 !important;
-    }}
-    
-    /* Color para el círculo de los radio buttons */
-    .stRadio [data-baseweb="radio"] input:checked + div {{
-        border-color: #E31837 !important;
-        background-color: #E31837 !important;
-    }}
-    
-    /* Estilo al pasar el mouse */
-    .stRadio [data-baseweb="radio"]:hover input + div {{
-        border-color: #E31837 !important;
-    }}
-    
-    /* Asegurarse de que el título del sidebar sea visible */
-    [data-testid="stSidebar"] h3 {{
-        color: #E31837 !important;
-        font-weight: bold !important;
-    }}
-    
-    /* Cambiar el fondo rojo de las opciones seleccionadas por un fondo gris */
-    div[role="radiogroup"] label[data-baseweb="radio"] {{
-        background-color: transparent !important;
-    }}
-    
-    div[role="radiogroup"] label[data-baseweb="radio"][aria-checked="true"] {{
-        background-color: #e6e6e6 !important;
-        border-radius: 4px;
-        padding: 3px;
-    }}
-    
-    /* Estilo para los botones (manteniendo tus colores) */
-    .stButton>button, .stDownloadButton>button {{
-        background-color: #E31837 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 4px !important;
-        padding: 0.5rem 1rem !important;
-        font-weight: bold !important;
-    }}
-    
-    .stButton>button:hover, .stDownloadButton>button:hover {{
-        background-color: #B30E29 !important;
-    }}
+/* RESET COMPLETO - SOLUCIÓN PARA FONDO ROJO EN OPCIONES RADIO */
+[data-testid="stSidebar"] {
+    background-color: #f5f5f5 !important;
+}
+
+/* Eliminar cualquier fondo rojo en CUALQUIER elemento dentro del sidebar */
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] span {
+    background: none !important;
+    background-color: #f5f5f5 !important;
+    background-image: none !important;
+}
+
+/* Específicamente para las opciones seleccionadas */
+[data-testid="stSidebar"] div[role="radiogroup"] label[data-baseweb="radio"][aria-checked="true"] {
+    background-color: #f5f5f5 !important;
+}
+
+/* Forzar que el texto sea visible y oscuro */
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] div {
+    color: #333333 !important;
+}
+
+/* El botón de radio seleccionado se mantiene rojo */
+.stRadio [data-baseweb="radio"] input:checked + div {
+    border-color: #E31837 !important;
+    background-color: #E31837 !important;
+}
+
+/* Título del sidebar en rojo Chiefs */
+[data-testid="stSidebar"] h3 {
+    color: #E31837 !important;
+    font-weight: bold !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -675,9 +649,8 @@ try:
         "🔍 Variables de calidad": "🔍 Análisis de variables clave de calidad"
     }
     
-    # Radio button con el estilo aplicado a través del CSS definido al inicio
-    # Se añade una etiqueta significativa y se oculta para resolver la advertencia de accesibilidad
-    eleccion = st.sidebar.radio(
+    # Cambiar de radio button a selectbox para evitar el problema del fondo rojo
+    eleccion = st.sidebar.selectbox(
         "Opciones de visualización", 
         list(opciones.keys()),
         label_visibility="collapsed"  # Oculta la etiqueta pero mantiene la accesibilidad
@@ -727,6 +700,23 @@ try:
     pdf_buffer = generar_pdf_completo(df, metricas)
     
     # Botón de descarga con estilo Chiefs
+    st.markdown(f"""
+    <style>
+    div.stDownloadButton > button:first-child {{
+        background-color: {CHIEFS_RED} !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: bold !important;
+    }}
+    
+    div.stDownloadButton > button:first-child:hover {{
+        background-color: {CHIEFS_RED_DARK} !important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+    
     descargar = st.download_button(
         label="📄 Descargar informe ejecutivo en PDF",
         data=pdf_buffer,
