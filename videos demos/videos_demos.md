@@ -7,7 +7,7 @@ Este directorio contiene los videos de demostración de las diferentes etapas de
 **Español**: Este video ofrece una visión general del proyecto completo y se recomienda verlo antes de los videos específicos de cada entregable para obtener una mejor comprensión del contexto global. **IMPORTANTE: Este video está disponible en español.**  
 **English**: This video provides an overview of the complete project and is recommended to watch before the specific videos of each deliverable to gain a better understanding of the global context. **IMPORTANT: This presentation video is available in Spanish only.**
 
-📹 [Ver video/Watch video: Video Presentación](./Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)
+📹 [Ver video/Watch video: Video Presentación](./Capstone%20Project%20%20%20Desarrollador10X%20IIA%20%20%20Araceli%20Fradejas%20Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)
 🎬 [Ver en YouTube/Watch on YouTube](https://youtu.be/8oreCBeRBVs)
 > **¡Recomendación!** Comienza tu exploración del proyecto viendo este video introductorio.
 

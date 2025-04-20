@@ -68,7 +68,7 @@ El directorio `/videos demos/` contiene grabaciones del proyecto en funcionamien
 
 ### ⭐ Video de Presentación - Recomendado Ver Primero ⭐
 **Español**: Este video ofrece una visión general del proyecto completo y se recomienda verlo antes de los videos específicos de cada entregable. **IMPORTANTE: Este video está disponible en español.**  
-📹 [Ver video local](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
+📹 [Ver video local](./videos%20demos/Capstone%20Project%20%20%20Desarrollador10X%20IIA%20%20%20Araceli%20Fradejas%20Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
 🎬 [Ver en YouTube](https://youtu.be/8oreCBeRBVs)
 > **¡Recomendación!** Comienza tu exploración del proyecto viendo este video introductorio.
 
@@ -189,7 +189,7 @@ The `/videos demos/` directory contains recordings of the project in operation:
 
 ### ⭐ Presentation Video - Recommended to Watch First ⭐
 **IMPORTANT**: This presentation video provides an overview of the complete project and is available **in Spanish only**.  
-📹 [Watch local video](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
+📹 [Watch local video](./videos%20demos/Capstone%20Project%20%20%20Desarrollador10X%20IIA%20%20%20Araceli%20Fradejas%20Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
 🎬 [Watch on YouTube](https://youtu.be/8oreCBeRBVs)
 > **Recommendation!** Start exploring the project by watching this introductory video.
 
