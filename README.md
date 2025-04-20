@@ -64,42 +64,37 @@ Para una descripción detallada de cada flujo, consultar el archivo [flujos.md](
 ---
 
 ## Videos Demostrativos
-El directorio `/videos demos/` contiene grabaciones del proyecto en funcionamiento:
+El directorio `/videos demos/` contiene enlaces a los videos de demostración del proyecto:
+
+> **IMPORTANTE**: Los archivos de video han sido excluidos del repositorio debido a limitaciones de tamaño de GitHub. Por favor, utiliza los enlaces de YouTube para ver los videos.
 
 ### ⭐ Video de Presentación - Recomendado Ver Primero ⭐
-**Español**: Este video ofrece una visión general del proyecto completo y se recomienda verlo antes de los videos específicos de cada entregable. **IMPORTANTE: Este video está disponible en español.**  
-📹 [Ver video local](./videos%20demos/Capstone%20Project%20%20%20Desarrollador10X%20IIA%20%20%20Araceli%20Fradejas%20Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
-🎬 [Ver en YouTube](https://youtu.be/8oreCBeRBVs)
+**Español**: Este video ofrece una visión general del proyecto completo. **IMPORTANTE: Este video está disponible en español.**  
+🎬 **[Ver en YouTube](https://youtu.be/8oreCBeRBVs)**
 > **¡Recomendación!** Comienza tu exploración del proyecto viendo este video introductorio.
 
 ### Entregable 1 - Análisis de Comentarios
 **Español**: Primera fase del proyecto enfocada en el análisis de comentarios de clientes utilizando técnicas de procesamiento de lenguaje natural.  
-📹 [Ver video local](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable1.mp4)  
-🎬 [Ver en YouTube](https://youtu.be/NqKmh-CEdBI)
+🎬 **[Ver en YouTube](https://youtu.be/NqKmh-CEdBI)**
 
 ### Entregable 2 - App Call Center con Gradio
 **Español**: Demostración de la aplicación Gradio para el equipo de Call Center.  
-📹 [Ver demo general](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable%202.mp4)  
-🎬 [Ver en YouTube](https://youtu.be/ETj7vEMu_Co)
+🎬 **[Ver en YouTube](https://youtu.be/ETj7vEMu_Co)**
 
 #### Demo Detallada de Gradio
 **Español**: Una mirada más profunda a la funcionalidad de la aplicación Gradio para el Call Center.  
-📹 [Ver demo detallada](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable2-App%20GRADIO.mp4)  
-🎬 [Ver en YouTube](https://youtu.be/vDs4BwcLUAU)
+🎬 **[Ver en YouTube](https://youtu.be/vDs4BwcLUAU)**
 
 ### Entregable 3 - Dashboard Ejecutivo
 **Español**: Dashboard desarrollado con Streamlit para el CEO y directivos.  
-📹 [Ver demo general](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3.mp4)  
-🎬 [Ver en YouTube](https://youtu.be/9QaC71r9A_s)
+🎬 **[Ver en YouTube](https://youtu.be/9QaC71r9A_s)**
 
 #### Demo en Diferentes Dispositivos
 **iPad Air 13**: Visualización del dashboard en tablet.  
-📹 [Ver en iPad Air 13](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPad%20Air13%202025.mp4)  
-🎬 [Ver en YouTube](https://youtube.com/shorts/1XyYyEJMPoY?feature=share)
+🎬 **[Ver en YouTube](https://youtube.com/shorts/1XyYyEJMPoY?feature=share)**
 
 **iPhone 16 Pro Max**: Versión móvil del dashboard.  
-📹 [Ver en iPhone 16 Pro Max](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPhone16%20ProMax.mp4)  
-🎬 [Ver en YouTube](https://youtube.com/shorts/083jXERVVWg?feature=share)
+🎬 **[Ver en YouTube](https://youtube.com/shorts/083jXERVVWg?feature=share)**
 
 Para más información sobre los videos, consultar [videos_demos.md](./videos%20demos/videos_demos.md).
 
@@ -185,38 +180,37 @@ The `/flujos/` directory contains diagrams representing the operation of each co
 For a detailed description of each flow, see the [flujos.md](./flujos/flujos.md) file.
 
 ## Demo Videos
-The `/videos demos/` directory contains recordings of the project in operation:
+The `/videos demos/` directory contains links to demonstration videos of the project:
+
+> **IMPORTANT**: Video files have been excluded from the repository due to GitHub size limitations. Please use the YouTube links to watch the videos.
 
 ### ⭐ Presentation Video - Recommended to Watch First ⭐
 **IMPORTANT**: This presentation video provides an overview of the complete project and is available **in Spanish only**.  
-📹 [Watch local video](./videos%20demos/Capstone%20Project%20%20%20Desarrollador10X%20IIA%20%20%20Araceli%20Fradejas%20Video%20Presentación%20Caso%20de%20Uso%20KelceTS.mp4)  
-🎬 [Watch on YouTube](https://youtu.be/8oreCBeRBVs)
+🎬 **[Watch on YouTube](https://youtu.be/8oreCBeRBVs)**
 > **Recommendation!** Start exploring the project by watching this introductory video.
 
 ### Deliverable 1 - Comment Analysis
-📹 [Watch local video](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable1.mp4)  
-🎬 [Watch on YouTube](https://youtu.be/NqKmh-CEdBI)
+**English**: This video shows the first phase of the project focused on customer comment analysis.  
+🎬 **[Watch on YouTube](https://youtu.be/NqKmh-CEdBI)**
 
 ### Deliverable 2 - Gradio Call Center App
-📹 [Watch general demo](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable%202.mp4)  
-🎬 [Watch on YouTube](https://youtu.be/ETj7vEMu_Co)
+**English**: Demonstration of the Gradio application for the Call Center team.  
+🎬 **[Watch on YouTube](https://youtu.be/ETj7vEMu_Co)**
 
 #### Detailed Gradio Demo
-📹 [Watch detailed demo](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable2-App%20GRADIO.mp4)  
-🎬 [Watch on YouTube](https://youtu.be/vDs4BwcLUAU)
+**English**: A deeper look into the functionality of the Gradio application.  
+🎬 **[Watch on YouTube](https://youtu.be/vDs4BwcLUAU)**
 
 ### Deliverable 3 - Executive Dashboard
-📹 [Watch general demo](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3.mp4)  
-🎬 [Watch on YouTube](https://youtu.be/9QaC71r9A_s)
+**English**: Dashboard developed with Streamlit for the CEO and executives.  
+🎬 **[Watch on YouTube](https://youtu.be/9QaC71r9A_s)**
 
 #### Demos on Different Devices
 **iPad Air 13**: Dashboard visualization on tablet.  
-📹 [Watch on iPad Air 13](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPad%20Air13%202025.mp4)  
-🎬 [Watch on YouTube](https://youtube.com/shorts/1XyYyEJMPoY?feature=share)
+🎬 **[Watch on YouTube](https://youtube.com/shorts/1XyYyEJMPoY?feature=share)**
 
 **iPhone 16 Pro Max**: Mobile version of the dashboard.  
-📹 [Watch on iPhone 16 Pro Max](./videos%20demos/Capstone-Project---Desarrollador10X-IIA---Araceli-Fradejas_videos%20demos_Entregable3_iPhone16%20ProMax.mp4)  
-🎬 [Watch on YouTube](https://youtube.com/shorts/083jXERVVWg?feature=share)
+🎬 **[Watch on YouTube](https://youtube.com/shorts/083jXERVVWg?feature=share)**
 
 For more information about the videos, see [videos_demos.md](./videos%20demos/videos_demos.md).
 
