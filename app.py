@@ -67,29 +67,29 @@ CHIEFS_RED_DARK = "#B30E29"  # Versión más oscura para hover
 # Aplicar estilos personalizados al sidebar y a los componentes
 st.markdown(f"""
 <style>
-    /* Estilo para el sidebar - fondo negro */
+    /* Estilo para el sidebar - fondo gris claro en lugar de negro */
     .css-1d391kg, [data-testid="stSidebar"], .css-1cypcdb, .css-1nm2qww, .css-1mbkxta {{
-        background-color: black !important;
+        background-color: #f5f5f5 !important;
     }}
     
-    /* Estilo para el texto en el sidebar */
+    /* Estilo para el texto en el sidebar - texto oscuro para contraste */
     [data-testid="stSidebar"] p, 
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
     [data-testid="stSidebar"] h4 {{
-        color: white !important;
+        color: #333333 !important;
     }}
     
     /* Estilo específico para las etiquetas de los radio buttons */
     .stRadio label {{
-        color: white !important;
+        color: #333333 !important;
         font-weight: bold !important;
     }}
     
     /* Estilo para el texto dentro de los radio buttons */
     .stRadio label span {{
-        color: white !important;
+        color: #333333 !important;
     }}
     
     /* Color para el círculo de los radio buttons */
@@ -107,6 +107,17 @@ st.markdown(f"""
     [data-testid="stSidebar"] h3 {{
         color: #E31837 !important;
         font-weight: bold !important;
+    }}
+    
+    /* Cambiar el fondo rojo de las opciones seleccionadas por un fondo gris */
+    div[role="radiogroup"] label[data-baseweb="radio"] {{
+        background-color: transparent !important;
+    }}
+    
+    div[role="radiogroup"] label[data-baseweb="radio"][aria-checked="true"] {{
+        background-color: #e6e6e6 !important;
+        border-radius: 4px;
+        padding: 3px;
     }}
     
     /* Estilo para los botones (manteniendo tus colores) */
@@ -215,7 +226,8 @@ def generar_grafico_calidad(df):
         xaxis_title="Variable de calidad",
         yaxis_title="Número de comentarios",
         legend_title="Valoración",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        template="plotly_white"
     )
     
     return fig
@@ -225,99 +237,99 @@ def generar_grafico_valoraciones(df):
     """Genera el gráfico de distribución de valoraciones"""
     df_plot = df["valoracion"].value_counts().reset_index()
     df_plot.columns = ["Valoración", "Cantidad"]
-    
-    # Color mapping
-    colores_valoraciones = {
-        "negativa": CHIEFS_RED, 
-        "parcial": CHIEFS_YELLOW, 
-        "positiva": "#28A745", 
-        "neutra": "#7f7f7f"
-    }
-    
-    fig = px.bar(
-        df_plot, 
-        x="Valoración", 
-        y="Cantidad", 
-        color="Valoración", 
-        color_discrete_map=colores_valoraciones
-    )
-    
-    fig.update_layout(
-        xaxis_title="Valoración",
-        yaxis_title="Número de comentarios"
-    )
-    
-    return fig
+
+    # Mapeo de colores con valor por defecto para valoraciones inesperadas
+    colores_valoraciones = {"negativa": CHIEFS_RED, "parcial": CHIEFS_YELLOW, "positiva": "#28A745", "neutra": "#7f7f7f"}
+    # Lista de colores por barra con gestión de valores inesperados
+    colors_list = []
+    for val in df_plot["Valoración"]:
+        if val in colores_valoraciones:
+            colors_list.append(colores_valoraciones[val])
+        else:
+            # Para valores no esperados usamos gris
+            colors_list.append("#7f7f7f")
+
+    # Crear figura con validación para evitar errores
+    try:
+        fig = px.bar(
+            df_plot,
+            x="Valoración",
+            y="Cantidad",
+            text="Cantidad"
+        )
+        fig.update_traces(marker_color=colors_list, textposition="outside")
+        fig.update_layout(
+            xaxis_title="Valoración",
+            yaxis_title="Número de comentarios",
+            showlegend=False,
+            template="plotly_white"
+        )
+        return fig
+    except Exception as e:
+        st.error(f"Error al generar el gráfico de valoraciones: {e}")
+        return None
 
 # Función para generar gráfico de idiomas
 def generar_grafico_idiomas(df):
     """Genera el gráfico de distribución por idioma"""
-    try:
-        df_agrupado = df.groupby("idioma")["valoracion"].value_counts().unstack().fillna(0)
-        for col in ["positiva", "negativa"]:
-            if col not in df_agrupado.columns:
-                df_agrupado[col] = 0
-        df_agrupado["total"] = df_agrupado.sum(axis=1)
-        df_agrupado["predominante"] = df_agrupado[["positiva", "negativa"]].idxmax(axis=1)
-        df_agrupado = df_agrupado.reset_index()
-        
-        # Banderas para idiomas
-        flags = {
-            "español": "🇪🇸", "alemán": "🇩🇪", "francés": "🇫🇷", "italiano": "🇮🇹", 
-            "portugués": "🇵🇹", "neerlandés": "🇳🇱", "polaco": "🇵🇱", "finlandés": "🇫🇮",
-            "sueco": "🇸🇪", "danés": "🇩🇰", "griego": "🇬🇷", "húngaro": "🇭🇺",
-            "checo": "🇨🇿", "rumano": "🇷🇴"
-        }
-        
-        df_agrupado["label"] = df_agrupado["idioma"].apply(lambda x: f"{flags.get(x, '')} {x}")
-        
-        # Color mapping
-        colores_valoraciones = {
-            "negativa": CHIEFS_RED, 
-            "parcial": CHIEFS_YELLOW, 
-            "positiva": "#28A745", 
-            "neutra": "#7f7f7f"
-        }
-        
-        fig = px.bar(
-            df_agrupado, 
-            x="label", 
-            y="total", 
-            text="total", 
-            color="predominante", 
-            color_discrete_map=colores_valoraciones
-        )
-        
-        fig.update_traces(textposition="outside")
-        fig.update_layout(
-            xaxis_title="Idioma",
-            yaxis_title="Número de comentarios"
-        )
-        
-        return fig
-    except Exception as e:
-        st.error(f"Error en gráfico de idiomas: {e}")
-        return None
+    df_agrupado = df.groupby("idioma")["valoracion"].value_counts().unstack().fillna(0)
+    for col in ["positiva", "negativa"]:
+        if col not in df_agrupado.columns:
+            df_agrupado[col] = 0
+    df_agrupado["total"] = df_agrupado.sum(axis=1)
+    df_agrupado["predominante"] = df_agrupado[["positiva", "negativa"]].idxmax(axis=1)
+    df_agrupado = df_agrupado.reset_index()
 
-# Función para generar gráfico de comunicaciones
+    flags = {"español": "🇪🇸", "alemán": "🇩🇪", "francés": "🇫🇷", "italiano": "🇮🇹", "portugués": "🇵🇹", "neerlandés": "🇳🇱", "polaco": "🇵🇱", "finlandés": "🇫🇮", "sueco": "🇸🇪", "danés": "🇩🇰", "griego": "🇬🇷", "húngaro": "🇭🇺", "checo": "🇨🇿", "rumano": "🇷🇴"}
+    df_agrupado["label"] = df_agrupado["idioma"].apply(lambda x: f"{flags.get(x, '')} {x}")
+
+    colores_valoraciones = {"negativa": CHIEFS_RED, "parcial": CHIEFS_YELLOW, "positiva": "#28A745", "neutra": "#7f7f7f"}
+    colors_list = [colores_valoraciones[val] for val in df_agrupado["predominante"]]
+
+    fig = px.bar(
+        df_agrupado,
+        x="label",
+        y="total",
+        text="total"
+    )
+    fig.update_traces(marker_color=colors_list, textposition="outside")
+    fig.update_layout(
+        xaxis_title="Idioma",
+        yaxis_title="Número de comentarios",
+        showlegend=False,
+        template="plotly_white"
+    )
+    return fig
+
+# Función para generar gráfico de comunicaciones usando go.Bar para colores precisos
 def generar_grafico_comunicaciones(df):
     """Genera el gráfico de tipos de comunicaciones"""
     df_plot = df["tipo_comunicacion"].value_counts().reset_index()
     df_plot.columns = ["Tipo de comunicación", "Cantidad"]
-    
-    fig = px.bar(
-        df_plot, 
-        x="Tipo de comunicación", 
-        y="Cantidad", 
-        color="Tipo de comunicación", 
-        color_discrete_sequence=[CHIEFS_YELLOW, "#28A745", CHIEFS_RED]
-    )
-    
+
+    # Definir colores según cada tipo
+    color_map = {
+        "📦 Notificación interna (logística/calidad)": CHIEFS_RED,
+        "✅ Respuesta al cliente": "#28A745",
+        "📧 Comunicación pendiente de revisión": CHIEFS_YELLOW
+    }
+    colors_list = [color_map.get(t, "#7f7f7f") for t in df_plot["Tipo de comunicación"]]
+
+    # Crear figura con Graph Objects para forzar colores
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=df_plot["Tipo de comunicación"],
+        y=df_plot["Cantidad"],
+        marker_color=colors_list,
+        text=df_plot["Cantidad"],
+        textposition="outside"
+    ))
     fig.update_layout(
         xaxis_title="Tipo de comunicación",
-        yaxis_title="Número de comentarios"
+        yaxis_title="Número de comentarios",
+        showlegend=False,
+        template="plotly_white"
     )
-    
     return fig
 
 # Función para generar PDF completo con todos los gráficos
@@ -338,6 +350,7 @@ def generar_pdf_completo(df, metricas):
     # Colores corporativos KelceTS y Chiefs
     color_rojo = colors.Color(int(CHIEFS_RED[1:3], 16)/255, int(CHIEFS_RED[3:5], 16)/255, int(CHIEFS_RED[5:7], 16)/255)
     color_amarillo = colors.Color(int(CHIEFS_YELLOW[1:3], 16)/255, int(CHIEFS_YELLOW[3:5], 16)/255, int(CHIEFS_YELLOW[5:7], 16)/255)
+    color_verde = colors.Color(0x28/255, 0xA7/255, 0x45/255)  # Color verde para valoraciones positivas
     color_negro = colors.black
     color_gris = colors.Color(0x6c/255, 0x75/255, 0x7d/255)
     
@@ -425,9 +438,8 @@ def generar_pdf_completo(df, metricas):
     
     # Generar y guardar gráfico de valoraciones
     fig_valoraciones = generar_grafico_valoraciones(df)
-    # Mayor resolución para mejor calidad en PDF
     gráfico_val_path = "/tmp/grafico_valoraciones.png"
-    fig_valoraciones.write_image(gráfico_val_path, width=1200, height=700, scale=2)
+    fig_valoraciones.write_image(gráfico_val_path, engine='kaleido', width=1200, height=700, scale=2)
     
     # Añadir imagen del gráfico
     c.drawImage(gráfico_val_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
@@ -468,8 +480,7 @@ def generar_pdf_completo(df, metricas):
     fig_idiomas = generar_grafico_idiomas(df)
     if fig_idiomas:
         gráfico_idiomas_path = "/tmp/grafico_idiomas.png"
-        # Mayor resolución para mejor calidad en PDF
-        fig_idiomas.write_image(gráfico_idiomas_path, width=1200, height=700, scale=2)
+        fig_idiomas.write_image(gráfico_idiomas_path, engine='kaleido', width=1200, height=700, scale=2)
         # Añadir imagen del gráfico
         c.drawImage(gráfico_idiomas_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
     
@@ -484,8 +495,7 @@ def generar_pdf_completo(df, metricas):
     # Generar y guardar gráfico de comunicaciones
     fig_comunicaciones = generar_grafico_comunicaciones(df)
     gráfico_com_path = "/tmp/grafico_comunicaciones.png"
-    # Mayor resolución para mejor calidad en PDF
-    fig_comunicaciones.write_image(gráfico_com_path, width=1200, height=700, scale=2)
+    fig_comunicaciones.write_image(gráfico_com_path, engine='kaleido', width=1200, height=700, scale=2)
     
     # Añadir imagen del gráfico
     c.drawImage(gráfico_com_path, x=1*cm, y=y_pos-8*cm, width=width-2*cm, height=7*cm)
@@ -525,8 +535,7 @@ def generar_pdf_completo(df, metricas):
     # Generar y guardar gráfico de variables de calidad
     fig_calidad = generar_grafico_calidad(df)
     gráfico_cal_path = "/tmp/grafico_calidad.png"
-    # Mayor resolución para mejor calidad en PDF
-    fig_calidad.write_image(gráfico_cal_path, width=1200, height=800, scale=2)
+    fig_calidad.write_image(gráfico_cal_path, engine='kaleido', width=1200, height=800, scale=2)
     
     # Añadir imagen del gráfico
     c.drawImage(gráfico_cal_path, x=1*cm, y=y_pos-9*cm, width=width-2*cm, height=8*cm)
